@@ -1,0 +1,13 @@
+{
+  "network": "arbitrum-rinkeby",
+  "liquidityPool": "0x022601eB546e007562A6dD4AE4840544E6B85c9B",
+  "liquidityPool-start-block": 14157603,
+  "oTokenFactory": "0xcBcC61d56bb2cD6076E2268Ea788F51309FA253B",
+  "oTokenFactory-start-block": 12079181,
+  "controller": "0x2acb561509a082bf2c58ce86cd30df6c2c2017f6",
+  "controller-start-block": 12080054,
+  "whitelist": "0x0cc0b0C984036e0942544F70A5708Ab16463cd31",
+  "whitelist-start-block": 12079189,
+  "addressBook": "0x2d3E178FFd961BD8C0b035C926F9f2363a436DdC",
+  "addressBook-start-block": 12079178
+}

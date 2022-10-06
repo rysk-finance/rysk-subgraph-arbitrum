@@ -1,0 +1,216 @@
+import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts"
+import {
+  Deposit,
+  DepositEpochExecuted,
+  InitiateWithdraw,
+  Redeem,
+  Withdraw,
+  WriteOption,
+  liquidityPool,
+  WithdrawalEpochExecuted,
+  RebalancePortfolioDelta
+} from "../generated/liquidityPool/liquidityPool"
+import { 
+  DailyStatSnapshot,
+  DepositAction, 
+  InitiateWithdrawAction, 
+  LPBalance,
+  RedeemSharesAction,
+  WithdrawAction, 
+  WriteOptionsAction
+} from "../generated/schema"
+import { BIGINT_ZERO, updateBuyerPosition, LIQUIDITY_POOL, BIGDECIMAL_ZERO } from "./helper"
+
+export function handleDeposit(event: Deposit): void {
+
+  const depositAction = new DepositAction(event.transaction.hash.toHex())
+
+  depositAction.address = event.params.recipient
+  depositAction.amount = event.params.amount
+  depositAction.epoch = event.params.epoch
+  depositAction.timestamp = event.block.timestamp
+
+  depositAction.save()
+
+  let lp = LPBalance.load(event.params.recipient.toHex())
+
+  if (lp == null ) {
+    lp = new LPBalance(event.params.recipient.toHex())
+    lp.balance = BIGINT_ZERO
+  } 
+
+  lp.balance = lp.balance.plus(event.params.amount)
+  lp.save()
+
+}
+
+export function handleInitiateWithdraw(event: InitiateWithdraw): void {
+
+  const initiateWithdrawAction = new InitiateWithdrawAction(event.transaction.hash.toHex())
+
+  initiateWithdrawAction.address = event.params.recipient
+  initiateWithdrawAction.amount = event.params.amount
+  initiateWithdrawAction.epoch = event.params.epoch
+  initiateWithdrawAction.timestamp = event.block.timestamp
+
+  initiateWithdrawAction.save()
+
+}
+
+export function handleRedeem(event: Redeem): void {
+  const redeemSharesAction = new RedeemSharesAction(event.transaction.hash.toHex())
+
+  redeemSharesAction.address = event.params.recipient
+  redeemSharesAction.amount = event.params.amount
+  redeemSharesAction.epoch = event.params.epoch
+  redeemSharesAction.timestamp = event.block.timestamp
+
+  redeemSharesAction.save()  
+}
+
+export function handleWithdraw(event: Withdraw): void {
+
+  const withdrawAction = new WithdrawAction(event.transaction.hash.toHex())
+
+  withdrawAction.address = event.params.recipient
+  withdrawAction.amount = event.params.amount
+  withdrawAction.timestamp = event.block.timestamp
+
+  withdrawAction.save()
+
+  let lp = LPBalance.load(event.params.recipient.toHex())
+
+  if (lp) {
+    lp.balance = lp.balance ? lp.balance.minus(event.params.amount) : event.params.amount
+    lp.save()
+  }
+
+}
+
+export function handleWriteOption(event: WriteOption): void {
+
+  const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
+
+  const buyer = event.params.buyer
+  const oToken = event.params.series.toHex()
+  const amount = event.params.amount
+  const premium = event.params.premium.times(BigInt.fromString("1000000000000")) // premium is 1e6 so needed to converted to 1e18 as amount 
+  const timestamp = event.block.timestamp
+
+  const id = event.transaction.hash.toHex() + "-" + oToken 
+
+  const writeOptionAction = new WriteOptionsAction(id)
+  
+  writeOptionAction.otoken = oToken
+  writeOptionAction.amount = amount //1e18
+  writeOptionAction.premium = premium
+  writeOptionAction.buyer = buyer
+  writeOptionAction.escrow = event.params.escrow
+  writeOptionAction.timestamp = timestamp
+
+  writeOptionAction.save()
+
+  updateBuyerPosition(buyer, oToken, amount, id);
+
+
+  // update total returns on daily snapshot
+  // using the alpha launch timestamp to remove the test data 1664553600
+  if (timestamp.toI32() >= 1664553600 ) {
+    const dailyStatSnapshot = getDailySnapshot(timestamp)
+    dailyStatSnapshot.totalReturns = dailyStatSnapshot.totalReturns.plus(premium)
+    // const totalAssets = lpContract.getAssets()
+    // dailyStatSnapshot.totalAssets = totalAssets
+    
+    dailyStatSnapshot.cumulativeYield = (dailyStatSnapshot.totalReturns.toBigDecimal())
+                                        .div(dailyStatSnapshot.totalAssets.toBigDecimal())
+    dailyStatSnapshot.save()
+  }
+
+}
+
+export function handleDepositEpochExecuted(event: DepositEpochExecuted): void {
+
+  const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
+
+  const timestamp = event.block.timestamp
+  const totalAssets = lpContract.getAssets()
+  const epoch = event.params.epoch
+
+  const dailyStatSnapshot = getDailySnapshot(timestamp)
+  dailyStatSnapshot.totalAssets = dailyStatSnapshot.totalReturns.plus(totalAssets)
+  dailyStatSnapshot.epoch = epoch
+  dailyStatSnapshot.save()
+
+}
+export function handleWithdrawalEpochExecuted(event: WithdrawalEpochExecuted): void {
+
+  const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
+
+  const timestamp = event.block.timestamp
+  const totalAssets = lpContract.getAssets()
+  const epoch = event.params.epoch
+
+  const dailyStatSnapshot = getDailySnapshot(timestamp)
+  dailyStatSnapshot.totalAssets = dailyStatSnapshot.totalReturns.plus(totalAssets)
+  dailyStatSnapshot.epoch = epoch
+  dailyStatSnapshot.save()
+
+}
+
+export function handleRebalancePortfolioDelta(event: RebalancePortfolioDelta): void {
+
+  const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
+
+  const timestamp = event.block.timestamp
+  const totalAssets = lpContract.getAssets()
+
+  const dailyStatSnapshot = getDailySnapshot(timestamp)
+  dailyStatSnapshot.totalAssets = dailyStatSnapshot.totalReturns.plus(totalAssets)
+  dailyStatSnapshot.save()
+
+}
+
+
+function getDailySnapshot(timestamp: BigInt): DailyStatSnapshot {
+  
+  let dayID = timestamp.toI32() / 86400
+  let dayStartUnix = dayID * 86400
+  let dayStartUnixBigInt = BigInt.fromI32(dayStartUnix)
+
+  let dailyStatSnapshot = DailyStatSnapshot.load('last')  
+
+  const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
+
+  if (dailyStatSnapshot === null) { 
+    dailyStatSnapshot = new DailyStatSnapshot('last')
+    dailyStatSnapshot.totalReturns  = BIGINT_ZERO
+
+    const totalAssets = lpContract.getAssets()
+    dailyStatSnapshot.totalAssets  = totalAssets
+
+    dailyStatSnapshot.cumulativeYield = BIGDECIMAL_ZERO
+    dailyStatSnapshot.epoch  = BIGINT_ZERO
+    dailyStatSnapshot.timestamp = dayStartUnixBigInt
+  }
+
+
+  if (dailyStatSnapshot !== null && dailyStatSnapshot.timestamp.notEqual(dayStartUnixBigInt) ) {
+    const totalReturns = dailyStatSnapshot.totalReturns
+    const totalAssets = dailyStatSnapshot.totalAssets
+    const cumulativeYield = dailyStatSnapshot.cumulativeYield
+    const epoch = dailyStatSnapshot.epoch
+    
+    dailyStatSnapshot.id = dailyStatSnapshot.timestamp.toString()
+    dailyStatSnapshot.save()
+    
+    dailyStatSnapshot = new DailyStatSnapshot('last')
+    dailyStatSnapshot.totalReturns  = totalReturns
+    dailyStatSnapshot.totalAssets  = totalAssets
+    dailyStatSnapshot.cumulativeYield  = cumulativeYield
+    dailyStatSnapshot.epoch  = epoch
+    dailyStatSnapshot.timestamp = dayStartUnixBigInt
+  }
+
+  return dailyStatSnapshot as DailyStatSnapshot
+
+}

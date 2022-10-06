@@ -1,0 +1,206 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+
+  - kind: ethereum
+    name: liquidityPool
+    network: {{network}}
+    source:
+      address: "{{liquidityPool}}"
+      abi: liquidityPool
+      startBlock: {{liquidityPool-start-block}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - DepositEpochExecuted
+        - InitiateWithdraw
+        - Withdraw
+        - WithdrawalEpochExecuted
+        - WriteOption
+        - RebalancePortfolioDelta
+      abis:
+        - name: liquidityPool
+          file: ./abis/liquidityPool.json
+      eventHandlers:
+        - event: Deposit(address,uint256,uint256)
+          handler: handleDeposit
+        - event: DepositEpochExecuted(uint256)
+          handler: handleDepositEpochExecuted
+        - event: InitiateWithdraw(address,uint256,uint256)
+          handler: handleInitiateWithdraw
+        - event: RebalancePortfolioDelta(int256)
+          handler: handleRebalancePortfolioDelta
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+        - event: Withdraw(address,uint256,uint256)
+          handler: handleWithdraw
+        - event: WithdrawalEpochExecuted(uint256)
+          handler: handleWithdrawalEpochExecuted
+        - event: WriteOption(address,uint256,uint256,uint256,address)
+          handler: handleWriteOption
+      file: ./src/LiquidityPool.ts
+
+  - kind: ethereum
+    name: OTokenFactory
+    network: {{network}}
+    source:
+      address: "{{oTokenFactory}}"
+      abi: OTokenFactory
+      startBlock: {{oTokenFactory-start-block}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - OtokenCreated
+      abis:
+        - name: OTokenFactory
+          file: ./abis/OTokenFactory.json
+        - name: OToken
+          file: ./abis/OToken.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: AddressBook
+          file: ./abis/AddressBook.json
+      eventHandlers:
+        - event: OtokenCreated(address,address,indexed address,indexed address,indexed address,uint256,uint256,bool)
+          handler: handleOtokenCreated
+      file: ./src/OTokenFactory.ts
+
+  - kind: ethereum
+    name: Controller
+    network: {{network}}
+    source:
+      address: "{{controller}}"
+      abi: Controller
+      startBlock: {{controller-start-block}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - CollateralAssetDeposited
+        - CollateralAssetWithdrawed
+        # - Redeem
+        # - ShortOtokenBurned
+        # - ShortOtokenMinted
+        - VaultOpened
+        - VaultSettled
+      abis:
+        - name: Controller
+          file: ./abis/Controller.json
+      eventHandlers:
+        - event: CollateralAssetDeposited(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleCollateralAssetDeposited
+        - event: CollateralAssetWithdrawed(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleCollateralAssetWithdrawed
+        # - event: Redeem(indexed address,indexed address,indexed address,address,uint256,uint256)
+        #   handler: handleRedeem
+        # - event: ShortOtokenBurned(indexed address,indexed address,indexed address,uint256,uint256)
+        #   handler: handleShortOtokenBurned
+        # - event: ShortOtokenMinted(indexed address,indexed address,indexed address,uint256,uint256)
+        #   handler: handleShortOtokenMinted
+        - event: VaultOpened(indexed address,uint256,indexed uint256)
+          handler: handleVaultOpened
+        - event: VaultSettled(indexed address,indexed address,address,uint256,uint256,indexed uint256)
+          handler: handleVaultSettled
+        - event: VaultLiquidated(indexed address,address,indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleLiquidation
+      file: ./src/Controller.ts
+
+  - kind: ethereum/contract
+    name: Whitelist
+    network: {{network}}
+    source:
+      address: "{{whitelist}}"
+      abi: Whitelist
+      startBlock: {{whitelist-start-block}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - CalleeBlacklisted
+        - CalleeWhitelisted
+        - CollateralBlacklisted
+        - CollateralWhitelisted
+        - OtokenBlacklisted
+        - OtokenWhitelisted
+        - OwnershipTransferred
+        - ProductBlacklisted
+        - ProductWhitelisted
+      abis:
+        - name: Whitelist
+          file: ./abis/Whitelist.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: CalleeBlacklisted(indexed address)
+          handler: handleCalleeBlacklisted
+        - event: CalleeWhitelisted(indexed address)
+          handler: handleCalleeWhitelisted
+        - event: CollateralBlacklisted(indexed address)
+          handler: handleCollateralBlacklisted
+        - event: CollateralWhitelisted(indexed address)
+          handler: handleCollateralWhitelisted
+        - event: OtokenBlacklisted(indexed address)
+          handler: handleOtokenBlacklisted
+        - event: OtokenWhitelisted(indexed address)
+          handler: handleOtokenWhitelisted
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: ProductBlacklisted(bytes32,indexed address,indexed address,indexed address,bool)
+          handler: handleProductBlacklisted
+        - event: ProductWhitelisted(bytes32,indexed address,indexed address,indexed address,bool)
+          handler: handleProductWhitelisted
+      file: ./src/Whitelist.ts
+
+  - kind: ethereum/contract
+    name: AddressBook
+    network: {{network}}
+    source:
+      address: "{{addressBook}}"
+      abi: AddressBook
+      startBlock: {{addressBook-start-block}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - AddressAdded
+        - OwnershipTransferred
+        - ProxyCreated
+      abis:
+        - name: AddressBook
+          file: ./abis/AddressBook.json
+        - name: Controller
+          file: ./abis/Controller.json
+      eventHandlers:
+        - event: ProxyCreated(indexed bytes32,indexed address)
+          handler: handleProxyCreated
+      file: ./src/AddressBook.ts
+templates:
+  - name: OToken
+    kind: ethereum
+    network: {{network}}
+    source:
+      abi: OToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - OToken
+      abis:
+        - name: OToken
+          file: ./abis/OToken.json
+      eventHandlers:
+        # - event: Approval(indexed address,indexed address,uint256)
+        #   handler: handleApproval
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/OToken.ts

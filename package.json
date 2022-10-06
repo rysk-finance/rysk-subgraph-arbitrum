@@ -1,0 +1,19 @@
+{
+  "name": "rysktestnet",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "prepare:arbitrum-rinkeby": "mustache config/arbitrum-rinkeby.json subgraph.template.yaml > subgraph.yaml",
+    "deploy:arbitrum-rinkeby": "npm run prepare:arbitrum-rinkeby && graph deploy --node https://api.thegraph.com/deploy/ ugolino/rysktestnet",
+    "prepare:arbitrum": "mustache config/arbitrum.json subgraph.template.yaml > subgraph.yaml",
+    "deploy:arbitrum": "npm run prepare:arbitrum && graph deploy --node https://api.thegraph.com/deploy/ rysk-finance/rysk"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.30.4",
+    "@graphprotocol/graph-ts": "0.27.0"
+  },
+  "devDependencies": {
+    "mustache": "^4.0.1"
+  }
+}

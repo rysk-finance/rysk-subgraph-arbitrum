@@ -1,0 +1,162 @@
+type DepositAction @entity {
+  id: ID!
+  address: Bytes!
+  amount: BigInt!
+  epoch: BigInt!
+  timestamp: BigInt!
+}
+
+type WithdrawAction @entity {
+  id: ID!
+  address: Bytes!
+  amount: BigInt!
+  timestamp: BigInt!
+}
+
+type InitiateWithdrawAction @entity {
+  id: ID!
+  address: Bytes!
+  amount: BigInt!
+  epoch: BigInt!
+  timestamp: BigInt!
+}
+
+type LPBalance @entity {
+  id: ID!
+  balance: BigInt!
+}
+
+type RedeemSharesAction @entity {
+  id: ID!
+  address: Bytes!
+  amount: BigInt!
+  epoch: BigInt!
+  timestamp: BigInt!
+}
+
+type WriteOptionsAction @entity {
+  id: ID!
+  otoken: OToken
+  amount: BigInt!
+  premium: BigInt!
+  buyer: Bytes!
+  escrow: BigInt!
+  timestamp: BigInt!
+}
+
+type DailyStatSnapshot @entity {
+  id: ID!
+  timestamp: BigInt!
+  totalReturns: BigInt!
+  totalAssets: BigInt!
+  cumulativeYield: BigDecimal
+  epoch: BigInt
+}
+
+# opyn
+
+type Account @entity {
+  id: ID!
+  balances: [AccountBalance!]! @derivedFrom(field: "account")
+  positions: [Position!]! @derivedFrom(field: "account")
+}
+
+type AccountBalance @entity {
+  " Equals to ${account}-${otoken}"
+  id: ID!
+  account: Account!
+  token: OToken!
+  balance: BigInt!
+}
+
+type Controller @entity {
+  id: ID!
+  addressBook: Bytes!
+  partialPauser: Bytes!
+  fullPauser: Bytes!
+  owner: Bytes!
+  systemPartiallyPaused: Boolean!
+  systemFullyPaused: Boolean!
+  callRestricted: Boolean!
+}
+
+type ERC20 @entity {
+  id: ID!
+  symbol: String!
+  name: String!
+  decimals: Int!
+}
+
+type OToken @entity {
+  id: ID!
+
+  # implementation address
+  implementation: Bytes!
+
+  name: String!
+  symbol: String!
+  decimals: Int!
+  strikeAsset: ERC20!
+  underlyingAsset: ERC20!
+  collateralAsset: ERC20!
+  creator: Bytes!
+  strikePrice: BigInt!
+  expiryTimestamp: BigInt!
+  isPut: Boolean!
+}
+
+type Position @entity {
+  "Equals to <account>-<oToken>"
+  id: ID!
+
+  account: Account!
+  oToken: OToken!
+  amount: BigInt!
+  writeOptionsTransactions: [WriteOptionsAction!]!
+
+  "Wheather this is an active or closed position."
+  active: Boolean!
+}
+
+type Vault @entity {
+  "Equals to <owner>-<vaultId>"
+  id: ID!
+  type: BigInt
+
+  owner: Account!
+  vaultId: BigInt!
+
+  shortOToken: OToken
+  longOToken: OToken
+  collateralAsset: ERC20
+  shortAmount: BigInt
+  longAmount: BigInt
+  collateralAmount: BigInt
+
+  " The first time this vault creates short position. Got reset after settleing and redeeming."
+  firstMintTimestamp: BigInt!
+}
+
+interface VaultAction {
+  " Equals to: <actionType>-<transactionHash>-<logId>"
+  id: ID!
+  " Transaction sender, either account or operator"
+  messageSender: Bytes!
+  " The vault that this action operates on"
+  vault: Vault!
+  " Block number "
+  block: BigInt!
+  " Transaction hash (tx) "
+  transactionHash: Bytes!
+  " Timestamp as seconds (time) "
+  timestamp: BigInt!
+}
+
+type WhitelistedProduct @entity {
+  id: ID!
+  underlying: ERC20!
+  strike: ERC20!
+  collateral: ERC20!
+  isPut: Boolean!
+  isWhitelisted: Boolean!
+}
