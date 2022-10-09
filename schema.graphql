@@ -42,6 +42,14 @@ type WriteOptionsAction @entity {
   buyer: Bytes!
   escrow: BigInt!
   timestamp: BigInt!
+  transactionHash: String!
+}
+
+type RebalanceDeltaAction @entity {
+  id: ID!
+  deltaChange: BigInt!
+  timestamp: BigInt!
+  transactionHash: String!
 }
 
 type DailyStatSnapshot @entity {

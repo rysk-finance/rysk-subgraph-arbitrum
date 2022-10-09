@@ -16,6 +16,7 @@ import {
   InitiateWithdrawAction, 
   LPBalance,
   RedeemSharesAction,
+  RebalanceDeltaAction,
   WithdrawAction, 
   WriteOptionsAction
 } from "../generated/schema"
@@ -89,7 +90,7 @@ export function handleWithdraw(event: Withdraw): void {
 
 export function handleWriteOption(event: WriteOption): void {
 
-  const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
+  // const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
 
   const buyer = event.params.buyer
   const oToken = event.params.series.toHex()
@@ -107,6 +108,8 @@ export function handleWriteOption(event: WriteOption): void {
   writeOptionAction.buyer = buyer
   writeOptionAction.escrow = event.params.escrow
   writeOptionAction.timestamp = timestamp
+  writeOptionAction.transactionHash = event.transaction.hash.toHex()
+
 
   writeOptionAction.save()
 
@@ -159,9 +162,18 @@ export function handleWithdrawalEpochExecuted(event: WithdrawalEpochExecuted): v
 
 export function handleRebalancePortfolioDelta(event: RebalancePortfolioDelta): void {
 
+  const id = event.transaction.hash.toHex()
+  const timestamp = event.block.timestamp
+
+  const rebalanceDeltaAction = new RebalanceDeltaAction(id)
+  rebalanceDeltaAction.timestamp = timestamp
+  rebalanceDeltaAction.deltaChange = event.params.deltaChange
+  rebalanceDeltaAction.transactionHash = event.transaction.hash.toHex()
+
+  rebalanceDeltaAction.save()
+
   const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
 
-  const timestamp = event.block.timestamp
   const totalAssets = lpContract.getAssets()
 
   const dailyStatSnapshot = getDailySnapshot(timestamp)
