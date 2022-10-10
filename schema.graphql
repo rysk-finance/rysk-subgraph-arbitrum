@@ -50,6 +50,7 @@ type RebalanceDeltaAction @entity {
   deltaChange: BigInt!
   timestamp: BigInt!
   transactionHash: String!
+  reactorIndex: Int
 }
 
 type DailyStatSnapshot @entity {
