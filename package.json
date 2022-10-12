@@ -7,7 +7,11 @@
     "prepare:arbitrum-rinkeby": "mustache config/arbitrum-rinkeby.json subgraph.template.yaml > subgraph.yaml",
     "deploy:arbitrum-rinkeby": "npm run prepare:arbitrum-rinkeby && graph deploy --node https://api.thegraph.com/deploy/ ugolino/rysktestnet",
     "prepare:arbitrum": "mustache config/arbitrum.json subgraph.template.yaml > subgraph.yaml",
-    "deploy:arbitrum": "npm run prepare:arbitrum && graph deploy --node https://api.thegraph.com/deploy/ rysk-finance/rysk"
+    "deploy:arbitrum": "npm run prepare:arbitrum && graph deploy --node https://api.thegraph.com/deploy/ rysk-finance/rysk",
+    "prepare:arbitrum-local": "mustache config/arbitrum-local.json subgraph.template.yaml > subgraph.yaml",
+    "create:local": "graph create rysk-local --node http://127.0.0.1:8020",
+    "deploy:local": "graph deploy rysk-local --debug-fork QmdYFoBFkU4AUGG1nX2bLK432WdSmdY6ucoMXhHcFCxUxN --ipfs http://127.0.0.1:5001 --node http://127.0.0.1:8020"
+
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.30.4",
