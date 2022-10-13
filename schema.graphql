@@ -45,6 +45,16 @@ type WriteOptionsAction @entity {
   transactionHash: String!
 }
 
+type BuybackOptionAction @entity {
+  id: ID!
+  otoken: OToken
+  amount: BigInt!
+  premium: BigInt!
+  seller: Bytes!
+  timestamp: BigInt!
+  transactionHash: String!
+}
+
 type RebalanceDeltaAction @entity {
   id: ID!
   deltaChange: BigInt!

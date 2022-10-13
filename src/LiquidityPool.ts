@@ -1,5 +1,6 @@
 import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts"
 import {
+  BuybackOption,
   Deposit,
   DepositEpochExecuted,
   InitiateWithdraw,
@@ -11,6 +12,7 @@ import {
   RebalancePortfolioDelta
 } from "../generated/liquidityPool/liquidityPool"
 import { 
+  BuybackOptionAction,
   DailyStatSnapshot,
   DepositAction, 
   InitiateWithdrawAction, 
@@ -128,6 +130,31 @@ export function handleWriteOption(event: WriteOption): void {
                                         .div(dailyStatSnapshot.totalAssets.toBigDecimal())
     dailyStatSnapshot.save()
   }
+
+}
+
+
+export function handleBuybackOption(event: BuybackOption): void {
+
+  const seller = event.params.seller
+  const oToken = event.params.series.toHex()
+  const amount = event.params.amount
+  const premium = event.params.premium.times(BigInt.fromString("1000000000000")) // premium is 1e6 so needed to converted to 1e18 as amount 
+  const timestamp = event.block.timestamp
+
+  const id = event.transaction.hash.toHex() + "-" + oToken 
+
+
+  const buybackOptionAction = new BuybackOptionAction(event.transaction.hash.toHex())
+
+  buybackOptionAction.otoken = oToken
+  buybackOptionAction.amount = amount //1e18
+  buybackOptionAction.premium = premium
+  buybackOptionAction.seller = seller
+  buybackOptionAction.timestamp = timestamp
+  buybackOptionAction.transactionHash = event.transaction.hash.toHex()
+
+  buybackOptionAction.save()
 
 }
 
