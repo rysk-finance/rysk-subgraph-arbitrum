@@ -62,6 +62,16 @@ type DailyStatSnapshot @entity {
   epoch: BigInt
 }
 
+type PricePerShare @entity {
+  " Equals to ${epoch}"
+  id: ID!
+  epoch: BigInt!
+  timestamp: BigInt!
+  value: BigInt!
+  growthSinceFirstEpoch: BigDecimal!
+  # growthSinceLastEpoch: BigDecimal!
+}
+
 # opyn
 
 type Account @entity {
