@@ -164,23 +164,19 @@ export function handleWithdrawalEpochExecuted(event: WithdrawalEpochExecuted): v
 
   const currentPricePerShare = lpContract.withdrawalEpochPricePerShare(epoch)
   const initialPricePerShare = lpContract.withdrawalEpochPricePerShare(BigInt.fromI32(0))
-  // const withdrawalEpochPricePerShareLast = lpContract.withdrawalEpochPricePerShare(epoch.minus(BigInt.fromI32(1)))
 
   let pricePerShare = new PricePerShare(epochString)
 
-  // let pricePerShare = new PricePerShare(epochString)
   pricePerShare.epoch = epoch
   pricePerShare.timestamp = timestamp
 
   /** Percentage Increase = [ (Final Value - Starting Value) / |Starting Value| ] × 100 */
-  pricePerShare.growthSinceFirstEpoch = ((currentPricePerShare.minus(initialPricePerShare).toBigDecimal()).div(initialPricePerShare.toBigDecimal())).times(BigDecimal.fromString('100'))
+  pricePerShare.growthSinceFirstEpoch = ((currentPricePerShare.minus(initialPricePerShare).toBigDecimal())
+      .div(initialPricePerShare.toBigDecimal()))
+      .times(BigDecimal.fromString('100'))
   pricePerShare.value = currentPricePerShare
 
-  // pricePerShare.growthSinceLastEpoch =
-  // ((withdrawalEpochPricePerShareCurrent.minus(withdrawalEpochPricePerShareLast).toBigDecimal())
-  // .div(withdrawalEpochPricePerShareLast.toBigDecimal())).times(BigDecimal.fromString('100'))
-
-    pricePerShare.save()
+  pricePerShare.save()
 
 }
 
