@@ -18,7 +18,8 @@ import {
   RedeemSharesAction,
   RebalanceDeltaAction,
   WithdrawAction, 
-  WriteOptionsAction
+  WriteOptionsAction,
+  PricePerShare
 } from "../generated/schema"
 import { BIGINT_ZERO, updateBuyerPosition, LIQUIDITY_POOL, BIGDECIMAL_ZERO } from "./helper"
 
@@ -145,6 +146,7 @@ export function handleDepositEpochExecuted(event: DepositEpochExecuted): void {
   dailyStatSnapshot.save()
 
 }
+
 export function handleWithdrawalEpochExecuted(event: WithdrawalEpochExecuted): void {
 
   const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
@@ -157,6 +159,24 @@ export function handleWithdrawalEpochExecuted(event: WithdrawalEpochExecuted): v
   dailyStatSnapshot.totalAssets = dailyStatSnapshot.totalReturns.plus(totalAssets)
   dailyStatSnapshot.epoch = epoch
   dailyStatSnapshot.save()
+
+  const epochString = epoch.toString()
+
+  const currentPricePerShare = lpContract.withdrawalEpochPricePerShare(epoch)
+  const initialPricePerShare = lpContract.withdrawalEpochPricePerShare(BigInt.fromI32(0))
+
+  let pricePerShare = new PricePerShare(epochString)
+
+  pricePerShare.epoch = epoch
+  pricePerShare.timestamp = timestamp
+
+  /** Percentage Increase = [ (Final Value - Starting Value) / |Starting Value| ] × 100 */
+  pricePerShare.growthSinceFirstEpoch = ((currentPricePerShare.minus(initialPricePerShare).toBigDecimal())
+      .div(initialPricePerShare.toBigDecimal()))
+      .times(BigDecimal.fromString('100'))
+  pricePerShare.value = currentPricePerShare
+
+  pricePerShare.save()
 
 }
 
