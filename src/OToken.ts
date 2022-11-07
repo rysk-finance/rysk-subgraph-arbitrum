@@ -2,7 +2,7 @@ import { Transfer } from "../generated/templates/OToken/OToken"
 
 import { OToken, AccountBalance } from '../generated/schema'
 import { Address, BigInt } from "@graphprotocol/graph-ts"
-import { BIGINT_ZERO, LIQUIDITY_POOL, loadOrCreateAccount, loadOrCreatePosition, OPTION_REGISTRY, ZERO_ADDRESS } from "./helper"
+import { BIGINT_ZERO, loadOrCreateAccount, loadOrCreatePosition, ZERO_ADDRESS } from "./helper"
 
 export function handleTransfer(event: Transfer): void {
   // Load oToken entity
