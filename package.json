@@ -6,12 +6,13 @@
     "build": "graph build",
     "prepare:arbitrum-rinkeby": "mustache config/arbitrum-rinkeby.json subgraph.template.yaml > subgraph.yaml",
     "deploy:arbitrum-rinkeby": "npm run prepare:arbitrum-rinkeby && graph deploy --node https://api.thegraph.com/deploy/ ugolino/rysktestnet",
+    "prepare:arbitrum-goerli": "mustache config/arbitrum-goerli.json subgraph.template.yaml > subgraph.yaml",
+    "deploy:arbitrum-goerli": "npm run prepare:arbitrum-goerli && graph deploy --node https://api.thegraph.com/deploy/ rysk-finance/rysk-goerli",
     "prepare:arbitrum": "mustache config/arbitrum.json subgraph.template.yaml > subgraph.yaml",
     "deploy:arbitrum": "npm run prepare:arbitrum && graph deploy --node https://api.thegraph.com/deploy/ rysk-finance/rysk",
     "prepare:arbitrum-local": "mustache config/arbitrum-local.json subgraph.template.yaml > subgraph.yaml",
     "create:local": "graph create rysk-local --node http://127.0.0.1:8020",
-    "deploy:local": "graph deploy rysk-local --debug-fork QmX83EeoVgmZuWBxmf52HPj5ZaFeSWsYGxd4xnngGrbarY --ipfs http://127.0.0.1:5001 --node http://127.0.0.1:8020"
-
+    "deploy:local": "graph deploy rysk-local --debug-fork QmWJcbnVSHr66trpwdarRpjnbosohjDxV6KjT5jUsbNfYX --ipfs http://127.0.0.1:5001 --node http://127.0.0.1:8020"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.30.4",
