@@ -4,8 +4,6 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "prepare:arbitrum-rinkeby": "mustache config/arbitrum-rinkeby.json subgraph.template.yaml > subgraph.yaml",
-    "deploy:arbitrum-rinkeby": "npm run prepare:arbitrum-rinkeby && graph deploy --node https://api.thegraph.com/deploy/ ugolino/rysktestnet",
     "prepare:arbitrum-goerli": "mustache config/arbitrum-goerli.json subgraph.template.yaml > subgraph.yaml",
     "deploy:arbitrum-goerli": "npm run prepare:arbitrum-goerli && graph deploy --node https://api.thegraph.com/deploy/ rysk-finance/rysk-goerli",
     "prepare:arbitrum": "mustache config/arbitrum.json subgraph.template.yaml > subgraph.yaml",
