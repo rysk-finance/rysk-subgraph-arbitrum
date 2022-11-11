@@ -36,9 +36,18 @@ Make sure you include the last `/` at the end of the url!
 
 run
 ```shell
-
 npm run deploy:arbitrum
 ```
+
+In case you are deploying to _Goerli Testnet_ apply these changes to `helper.ts` beforehand:
+
+```txt
+-export const LIQUIDITY_POOL = "0xc10b976c671ce9bff0723611f01422acbae100a5"
+-export const OPTION_REGISTRY = "0x04706de6ce851a284b569ebae2e258225d952368"
++export const LIQUIDITY_POOL = "0x2ceDe96cd46C9B751EeB868A57FEDeD060Dbe6Bf"
++export const OPTION_REGISTRY = "0x48A74b742bd97545ace8B0876F5BA7ED19DF6579"
+```
+
 
 ### Local Forking
 
