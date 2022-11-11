@@ -5,7 +5,7 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "prepare:arbitrum-goerli": "mustache config/arbitrum-goerli.json subgraph.template.yaml > subgraph.yaml",
-    "deploy:arbitrum-goerli": "npm run prepare:arbitrum-goerli && graph deploy --node https://api.thegraph.com/deploy/ rysk-finance/rysk-goerli",
+    "deploy:arbitrum-goerli": "npm run prepare:arbitrum-goerli && graph deploy --node https://api.thegraph.com/deploy/ devey/rysk-goerli-yassine",
     "prepare:arbitrum": "mustache config/arbitrum.json subgraph.template.yaml > subgraph.yaml",
     "deploy:arbitrum": "npm run prepare:arbitrum && graph deploy --node https://api.thegraph.com/deploy/ rysk-finance/rysk",
     "prepare:arbitrum-local": "mustache config/arbitrum-local.json subgraph.template.yaml > subgraph.yaml",
