@@ -1,13 +1,13 @@
 {
-  "network": "arbitrum-goerli",
-  "liquidityPool": "0xfD93dB0a7c1e373bdfE9b141693a25E4deb79dF2",
-  "liquidityPool-start-block": 6382004,
-  "oTokenFactory": "0x7595F9c5B93f1478dC0836BdFCb87fF3A8970B10",
-  "oTokenFactory-start-block": 867511,
-  "controller": "0x11a602a5F5D823c103bb8b7184e22391Aae5F4C2",
-  "controller-start-block": 867543,
-  "whitelist": "0xf6651D140AEEE442E91A6BAe418c4993d0190370",
-  "whitelist-start-block": 867522,
-  "addressBook": "0xd6e67bF0b1Cdb34C37f31A2652812CB30746a94A",
-  "addressBook-start-block": 867509
+  "network": "arbitrum",
+  "liquidityPool": "0xc10b976c671ce9bff0723611f01422acbae100a5",
+  "liquidityPool-start-block": 25976686,
+  "oTokenFactory": "0xBa1952eCdbA02de66fCf73f29068e8cf072644ec",
+  "oTokenFactory-start-block": 24287601,
+  "controller": "0x594bD4eC29F7900AE29549c140Ac53b5240d4019",
+  "controller-start-block": 24287805,
+  "whitelist": "0x84CaCC4103CeE1Da9b79f9Ed0Ed97414240D9c6F",
+  "whitelist-start-block": 24287660,
+  "addressBook": "0xCa19F26c52b11186B4b1e76a662a14DA5149EA5a",
+  "addressBook-start-block": 24287589
 }
