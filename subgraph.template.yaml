@@ -185,6 +185,32 @@ dataSources:
         - event: ProxyCreated(indexed bytes32,indexed address)
           handler: handleProxyCreated
       file: ./src/AddressBook.ts
+
+  - kind: ethereum/contract
+    name: OptionCatalogue
+    network: {{network}}
+    source:
+      address: "{{optionCatalogue}}"
+      abi: OptionCatalogue
+      startBlock: {{optionCatalogue-start-block}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Serie
+        - Expiry
+      abis:
+        - name: OptionCatalogue
+          file: ./abis/OptionCatalogue.json
+      eventHandlers:
+        - event: SeriesApproved(uint64,uint128,bool,bool,bool)
+          handler: handleSeriesApproved
+        - event: SeriesAltered(uint64,uint128,bool,bool,bool)
+          handler: handleSeriesAltered
+      file: ./src/OptionCatalogue.ts
+
+
 templates:
   - name: OToken
     kind: ethereum
