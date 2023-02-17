@@ -81,6 +81,23 @@ type PricePerShare @entity {
   growthSinceFirstEpoch: BigDecimal!
 }
 
+# beyond
+
+type Serie @entity {
+  id: ID!
+  strike: BigInt!
+  expiration: BigInt!
+  isPut: Boolean!
+  isBuyable: Boolean!
+  isSellable: Boolean!
+}
+
+type Expiry @entity {
+  id: ID!
+  timestamp: BigInt!
+  utc: String!
+}
+
 # opyn
 
 type Account @entity {
