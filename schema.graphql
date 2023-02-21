@@ -102,6 +102,10 @@ type Expiry @entity {
 
 type Account @entity {
   id: ID!
+
+  "Amount of vaults this account has"
+  vaultCount: BigInt!
+
   balances: [AccountBalance!]! @derivedFrom(field: "account")
   positions: [Position!]! @derivedFrom(field: "account")
 }

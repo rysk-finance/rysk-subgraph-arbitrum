@@ -1,4 +1,4 @@
-
+import { BigInt } from "@graphprotocol/graph-ts";
 import {
   CollateralAssetDeposited,
   CollateralAssetWithdrawed,
@@ -80,20 +80,17 @@ export function handleVaultOpened(event: VaultOpened): void {
 
   // update the account entity
   let account = loadOrCreateAccount(accountId);
+  account.vaultCount = account.vaultCount.plus(BigInt.fromI32(1));
   account.save();
 
-  // create and initialized a vault entity only for LiquidityPool
-  if (accountId == OPTION_REGISTRY ) {
-    let vaultId = accountId + '-' + id.toString();
-    let vault = new Vault(vaultId);
-    vault.owner = accountId;
-    vault.vaultId = id;
-    vault.type = event.params.vaultType;
-    vault.firstMintTimestamp = BIGINT_ZERO;
+  let vaultId = accountId + '-' + id.toString();
+  let vault = new Vault(vaultId);
+  vault.owner = accountId;
+  vault.vaultId = id;
+  vault.type = event.params.vaultType;
+  vault.firstMintTimestamp = BIGINT_ZERO;
 
-    vault.save();
-  }
-
+  vault.save();
 }
 
 export function handleVaultSettled(event: VaultSettled): void {

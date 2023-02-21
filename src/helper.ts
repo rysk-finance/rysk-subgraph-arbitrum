@@ -59,6 +59,7 @@ export function loadOrCreateAccount(accountId: string): Account {
   // if no account, create new entity
   if (account == null) {
     account = new Account(accountId);
+    account.vaultCount = new BigInt(0);
   }
   return account as Account;
 }
