@@ -12,7 +12,7 @@ dataSources:
       startBlock: {{liquidityPool-start-block}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Deposit
@@ -55,7 +55,7 @@ dataSources:
       startBlock: {{oTokenFactory-start-block}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - OtokenCreated
@@ -82,7 +82,7 @@ dataSources:
       startBlock: {{controller-start-block}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - CollateralAssetDeposited
@@ -123,7 +123,7 @@ dataSources:
       startBlock: {{whitelist-start-block}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - CalleeBlacklisted
@@ -170,7 +170,7 @@ dataSources:
       startBlock: {{addressBook-start-block}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - AddressAdded
@@ -219,7 +219,7 @@ templates:
       abi: OToken
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - OToken
