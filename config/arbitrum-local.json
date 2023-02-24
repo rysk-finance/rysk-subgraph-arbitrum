@@ -3,11 +3,13 @@
   "liquidityPool": "0xfD93dB0a7c1e373bdfE9b141693a25E4deb79dF2",
   "liquidityPool-start-block": 6382004,
   "oTokenFactory": "0x7595F9c5B93f1478dC0836BdFCb87fF3A8970B10",
-  "oTokenFactory-start-block": 867511,
+  "oTokenFactory-start-block": 6263605,
   "controller": "0x11a602a5F5D823c103bb8b7184e22391Aae5F4C2",
-  "controller-start-block": 867543,
+  "controller-start-block": 6299244,
   "whitelist": "0xf6651D140AEEE442E91A6BAe418c4993d0190370",
-  "whitelist-start-block": 867522,
+  "whitelist-start-block": 6263605,
   "addressBook": "0xd6e67bF0b1Cdb34C37f31A2652812CB30746a94A",
-  "addressBook-start-block": 867509
+  "addressBook-start-block": 6382004,
+  "optionCatalogue": "0xFE767C13EB75686817E4be774fAEEaBE93346887",
+  "optionCatalogue-start-block": 6382199
 }
