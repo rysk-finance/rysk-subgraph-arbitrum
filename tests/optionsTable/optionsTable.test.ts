@@ -22,7 +22,7 @@ test(
       "Serie",
       newSeriesApprovedEvent.transaction.hash.toHex(),
       "expiration",
-      "9328423894"
+      "1664553600"
     );
     log.success("Correct Serie ID", []);
   },
