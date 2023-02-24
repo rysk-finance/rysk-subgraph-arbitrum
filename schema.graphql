@@ -152,6 +152,11 @@ type OToken @entity {
   strikePrice: BigInt!
   expiryTimestamp: BigInt!
   isPut: Boolean!
+
+  createdAt: BigInt!
+  createdTx: Bytes!
+
+  totalSupply: BigInt!
 }
 
 type Position @entity {
