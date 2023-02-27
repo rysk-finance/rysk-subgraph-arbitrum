@@ -11,5 +11,9 @@
   "addressBook": "0xd6e67bF0b1Cdb34C37f31A2652812CB30746a94A",
   "addressBook-start-block": 867509,
   "optionCatalogue": "0xFE767C13EB75686817E4be774fAEEaBE93346887",
-  "optionCatalogue-start-block": 6382199
+  "optionCatalogue-start-block": 6382199,
+  "optionExchange": "0xe8aBa01d9A71D64196d0AE47Cf3B49AFc8149457",
+  "optionExchange-start-block": 6382255,
+  "volatilityFeed": "0xa0bC9BADC8F9489D440C5B16cf5f51273080137E",
+  "volatilityFeed-start-block": 6381690
 }
