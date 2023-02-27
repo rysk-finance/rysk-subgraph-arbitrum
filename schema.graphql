@@ -98,6 +98,27 @@ type Expiry @entity {
   utc: String!
 }
 
+type Collateral @entity {
+  " Equals to collateral address"
+  id: ID!
+  calls: Boolean!
+  puts: Boolean!
+}
+
+type SABR @entity {
+  " Equals to expiry"
+  id: ID!
+  callAlpha: Int!,
+  callBeta: Int!,
+  callRho: Int!,
+  callVolvol: Int!,
+  putAlpha: Int!,
+  putBeta: Int!,
+  putRho: Int!,
+  putVolvol: Int!,
+  interestRate: BigInt!
+}
+
 # opyn
 
 type Account @entity {
