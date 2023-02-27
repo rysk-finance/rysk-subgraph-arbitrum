@@ -210,6 +210,48 @@ dataSources:
           handler: handleSeriesAltered
       file: ./src/OptionCatalogue.ts
 
+  - kind: ethereum/contract
+    name: OptionExchange
+    network: {{network}}
+    source:
+      address: "{{optionExchange}}"
+      abi: OptionExchange
+      startBlock: {{optionExchange-start-block}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Collateral
+      abis:
+        - name: OptionExchange
+          file: ./abis/OptionExchange.json
+      eventHandlers:
+        - event: CollateralApprovalChanged(indexed address,bool,bool)
+          handler: handleCollateralApprovalChanged
+      file: ./src/OptionExchange.ts
+
+  - kind: ethereum/contract
+    name: VolatilityFeed
+    network: {{network}}
+    source:
+      address: "{{volatilityFeed}}"
+      abi: VolatilityFeed
+      startBlock: {{volatilityFeed-start-block}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - SABR
+      abis:
+        - name: VolatilityFeed
+          file: ./abis/VolatilityFeed.json
+      eventHandlers:
+        - event: SabrParamsSet(indexed uint256,int32,int32,int32,int32,int32,int32,int32,int32,int256)
+          handler: handleSabrParamsSet
+      file: ./src/VolatilityFeed.ts
+
 
 templates:
   - name: OToken
