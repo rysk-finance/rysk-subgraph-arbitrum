@@ -23,7 +23,7 @@ import {
   WriteOptionsAction,
   PricePerShare
 } from "../generated/schema"
-import { BIGINT_ZERO, updateBuyerPosition, LIQUIDITY_POOL, BIGDECIMAL_ZERO } from "./helper"
+import { BIGINT_ZERO, updateOptionPosition, LIQUIDITY_POOL, BIGDECIMAL_ZERO } from "./helper"
 
 export function handleDeposit(event: Deposit): void {
 
@@ -116,7 +116,7 @@ export function handleWriteOption(event: WriteOption): void {
 
   writeOptionAction.save()
 
-  updateBuyerPosition(buyer, oToken, amount, id);
+  // updateOptionPosition(buyer, oToken, amount, id);
 
 
   // update total returns on daily snapshot

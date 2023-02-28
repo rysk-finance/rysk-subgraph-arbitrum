@@ -47,6 +47,55 @@ dataSources:
       file: ./src/LiquidityPool.ts
 
   - kind: ethereum
+    name: optionExchange
+    network: {{network}}
+    source:
+      address: "{{optionExchange}}"
+      abi: optionExchange
+      startBlock: {{optionExchange-start-block}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - OptionsBought
+        - OptionsSold
+      abis:
+        - name: optionExchange
+          file: ./abis/optionExchange.json
+      eventHandlers:
+        - event: OptionsBought(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleOptionsBought
+        - event: OptionsSold(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleOptionsSold
+      file: ./src/optionExchange.ts
+
+  - kind: ethereum
+    name: optionHandler
+    network: {{network}}
+    source:
+      address: "{{optionHandler}}"
+      abi: optionHandler
+      startBlock: {{optionHandler-start-block}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - OptionsBought
+        - OptionsSold
+      abis:
+        - name: optionHandler
+          file: ./abis/optionHandler.json
+      eventHandlers:
+        - event: OptionsBought(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleOptionsBought
+        - event: OptionsSold(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleOptionsSold
+      file: ./src/optionHandler.ts
+
+
+  - kind: ethereum
     name: OTokenFactory
     network: {{network}}
     source:

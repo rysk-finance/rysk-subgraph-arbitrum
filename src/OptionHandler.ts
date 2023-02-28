@@ -1,37 +1,14 @@
-import { CollateralApprovalChanged } from "../generated/OptionExchange/OptionExchange";
+
 import {
   OptionsBought,
   OptionsSold
-} from '../generated/OptionExchange/OptionExchange';
+} from '../generated/OptionHandler/OptionHandler';
 
 import {
   OptionsBoughtAction,
-  OptionsSoldAction,
-  Collateral
+  OptionsSoldAction
 } from '../generated/schema';
-
 import { updateOptionPosition } from './helper';
-
-export function handleCollateralApprovalChanged(
-  event: CollateralApprovalChanged
-): void {
-  // Load or create collateral
-  let collateral = Collateral.load(event.params.collateral.toString());
-
-  if (collateral == null) {
-    collateral = new Collateral(event.params.collateral.toString());
-    collateral.calls = false;
-    collateral.puts = false;
-  }
-
-  if (event.params.isPut) {
-    collateral.puts = event.params.isApproved;
-  } else {
-    collateral.calls = event.params.isApproved;
-  }
-
-  collateral.save();
-}
 
 export function handleOptionsBought(event: OptionsBought): void {
 

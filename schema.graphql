@@ -34,6 +34,28 @@ type RedeemSharesAction @entity {
   timestamp: BigInt!
 }
 
+type OptionsBoughtAction @entity {
+  id: ID!
+  otoken: OToken
+  amount: BigInt!
+  premium: BigInt!
+  fee: BigInt!
+  buyer: Bytes!
+  timestamp: BigInt!
+  transactionHash: String!
+}
+
+type OptionsSoldAction @entity {
+  id: ID!
+  otoken: OToken
+  amount: BigInt!
+  premium: BigInt!
+  fee: BigInt!
+  seller: Bytes!
+  timestamp: BigInt!
+  transactionHash: String!
+}
+
 type WriteOptionsAction @entity {
   id: ID!
   otoken: OToken
@@ -187,7 +209,9 @@ type Position @entity {
   account: Account!
   oToken: OToken!
   amount: BigInt!
-  writeOptionsTransactions: [WriteOptionsAction!]!
+  # writeOptionsTransactions: [WriteOptionsAction!]!
+  optionsBoughtTransactions: [OptionsBoughtAction!]!
+  optionsSoldTransactions: [OptionsSoldAction!]!
 
   "Wheather this is an active or closed position."
   active: Boolean!

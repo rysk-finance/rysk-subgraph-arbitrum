@@ -19,17 +19,28 @@ export function isZeroAddress(value: Address): boolean {
   return value.toHex() == ZERO_ADDRESS
 }
 
-export function updateBuyerPosition(buyer: Address, oToken: string, amount: BigInt, tradeId: string): void {
+export function updateOptionPosition(isBuy: boolean, trader: Address, oToken: string, amount: BigInt, tradeId: string): void {
 
-  let position = loadOrCreatePosition(buyer, oToken)
+  let position = loadOrCreatePosition(trader, oToken)
 
-  position.amount = position.amount.plus(amount);
+  position.amount = isBuy ? position.amount.plus(amount) : position.amount.minus(amount);
   // set position to inactive (closed) whenever we get back to amount = 0 
   if (position.amount.isZero()) position.active = false
 
-  let writeOptionsTransactions = position.writeOptionsTransactions 
-  writeOptionsTransactions.push(tradeId)
-  position.writeOptionsTransactions = writeOptionsTransactions
+  // let writeOptionsTransactions = position.writeOptionsTransactions 
+  // writeOptionsTransactions.push(tradeId)
+  // position.writeOptionsTransactions = writeOptionsTransactions
+
+  if (isBuy) {
+    const optionsBoughtTransactions = position.optionsBoughtTransactions
+    optionsBoughtTransactions.push(tradeId)
+    position.optionsBoughtTransactions = optionsBoughtTransactions    
+  } else if (!isBuy) {
+      const optionsSoldTransactions = position.optionsSoldTransactions
+      optionsSoldTransactions.push(tradeId)
+      position.optionsSoldTransactions = optionsSoldTransactions     
+  }
+
   position.save()
 }
 
@@ -47,7 +58,9 @@ export function loadOrCreatePosition(user: Address, oToken: string): Position {
     position.oToken = oToken;
     position.amount = BIGINT_ZERO;
     position.active = true;
-    position.writeOptionsTransactions = [];
+    // position.writeOptionsTransactions = [];
+    position.optionsBoughtTransactions = [];
+    position.optionsSoldTransactions = [];
     // position.settleActions = [];
 
   }
