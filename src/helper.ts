@@ -12,8 +12,8 @@ export let BIGDECIMAL_ONE = BigDecimal.fromString('1')
 
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
-export const LIQUIDITY_POOL = "0xfD93dB0a7c1e373bdfE9b141693a25E4deb79dF2"
-export const OPTION_REGISTRY = "0xF37D82c5ee757eE05B08ed469d1CC90c301c8636"
+export const LIQUIDITY_POOL = "0xc10b976c671ce9bff0723611f01422acbae100a5"
+export const OPTION_REGISTRY = "0x04706de6ce851a284b569ebae2e258225d952368"
 
 export function isZeroAddress(value: Address): boolean {
   return value.toHex() == ZERO_ADDRESS

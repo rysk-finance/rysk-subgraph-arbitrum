@@ -1,9 +1,9 @@
 {
   "network": "arbitrum-goerli",
-  "liquidityPool": "0xfD93dB0a7c1e373bdfE9b141693a25E4deb79dF2",
-  "liquidityPool-start-block": 6382004,
+  "liquidityPool": "0x2ceDe96cd46C9B751EeB868A57FEDeD060Dbe6Bf",
+  "liquidityPool-start-block": 867957,
   "oTokenFactory": "0x7595F9c5B93f1478dC0836BdFCb87fF3A8970B10",
-  "oTokenFactory-start-block": 6263605,
+  "oTokenFactory-start-block": 867511,
   "controller": "0x11a602a5F5D823c103bb8b7184e22391Aae5F4C2",
   "controller-start-block": 6299244,
   "whitelist": "0xf6651D140AEEE442E91A6BAe418c4993d0190370",
