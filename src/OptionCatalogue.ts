@@ -19,7 +19,7 @@ const getEntityID = (
           .concat(isPut ? "P" : "C")
       )
     )
-    .toString();
+    .toHexString();
 };
 
 // this creates a new Serie Entity and Expiry Entity if it doesn't exist

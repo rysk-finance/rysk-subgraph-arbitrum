@@ -16,10 +16,10 @@ export function handleCollateralApprovalChanged(
   event: CollateralApprovalChanged
 ): void {
   // Load or create collateral
-  let collateral = Collateral.load(event.params.collateral.toString());
+  let collateral = Collateral.load(event.params.collateral.toHexString());
 
   if (collateral == null) {
-    collateral = new Collateral(event.params.collateral.toString());
+    collateral = new Collateral(event.params.collateral.toHexString());
     collateral.calls = false;
     collateral.puts = false;
   }
