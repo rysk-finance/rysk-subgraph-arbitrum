@@ -112,6 +112,7 @@ type Serie @entity {
   isPut: Boolean!
   isBuyable: Boolean!
   isSellable: Boolean!
+  netDHVExposure: BigInt!
 }
 
 type Expiry @entity {

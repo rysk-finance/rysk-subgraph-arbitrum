@@ -282,6 +282,27 @@ dataSources:
           handler: handleSabrParamsSet
       file: ./src/VolatilityFeed.ts
 
+  - kind: ethereum/contract
+    name: AlphaPortfolioValuesFeed
+    network: {{network}}
+    source:
+      address: "{{alphaPortfolioValuesFeed}}"
+      abi: AlphaPortfolioValuesFeed
+      startBlock: {{alphaPortfolioValuesFeed-start-block}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Serie
+      abis:
+        - name: AlphaPortfolioValuesFeed
+          file: ./abis/AlphaPortfolioValuesFeed.json
+      eventHandlers:
+        - event: StoresUpdated(address,int256,int256,(uint64,uint128,bool,address,address,address))
+          handler: handleStoresUpdated
+      file: ./src/AlphaPortfolioValuesFeed.ts
+
 
 templates:
   - name: OToken

@@ -17,5 +17,7 @@
   "optionExchange": "0xFCc90f3c220cF6637983347f49540E359ec07D8c",
   "optionExchange-start-block": 9466848,
   "optionHandler": "0x14Aa0259425D5a02EEd5782CEde6Ef9bDb897584",
-  "optionHandler-start-block": 9465258
+  "optionHandler-start-block": 9465258,
+  "alphaPortfolioValuesFeed": "0x29788161c9CDbFeE87983364af12AE5Fe943ECDF",
+  "alphaPortfolioValuesFeed-start-block": 6381750
 }

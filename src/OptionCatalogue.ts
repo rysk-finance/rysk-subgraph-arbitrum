@@ -5,7 +5,7 @@ import {
 } from "../generated/OptionCatalogue/OptionCatalogue";
 import { Serie, Expiry } from "../generated/schema";
 
-const getEntityID = (
+export const getEntityID = (
   strike: BigInt,
   expiration: BigInt,
   isPut: boolean
@@ -39,6 +39,7 @@ export function handleSeriesApproved(event: SeriesApproved): void {
   entitySerie.isPut = event.params.isPut;
   entitySerie.isBuyable = event.params.isBuyable;
   entitySerie.isSellable = event.params.isSellable;
+  entitySerie.netDHVExposure = BigInt.fromI32(0);
 
   entitySerie.save();
 
