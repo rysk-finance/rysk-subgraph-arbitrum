@@ -12,8 +12,8 @@ export let BIGDECIMAL_ONE = BigDecimal.fromString('1')
 
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
-export const LIQUIDITY_POOL = "0xc10b976c671ce9bff0723611f01422acbae100a5"
-export const OPTION_REGISTRY = "0x04706de6ce851a284b569ebae2e258225d952368"
+export const LIQUIDITY_POOL = "0xfd93db0a7c1e373bdfe9b141693a25e4deb79df2"
+export const OPTION_REGISTRY = "0xF37D82c5ee757eE05B08ed469d1CC90c301c8636"
 
 export function isZeroAddress(value: Address): boolean {
   return value.toHex() == ZERO_ADDRESS
@@ -23,19 +23,21 @@ export function updateOptionPosition(isBuy: boolean, trader: Address, oToken: st
 
   let position = loadOrCreatePosition(trader, oToken)
 
-  position.amount = isBuy ? position.amount.plus(amount) : position.amount.minus(amount);
+  position.netAmount = isBuy ? position.netAmount.plus(amount) : position.netAmount.minus(amount);
   // set position to inactive (closed) whenever we get back to amount = 0 
-  if (position.amount.isZero()) position.active = false
+  if (position.netAmount.isZero()) position.active = false
 
   // let writeOptionsTransactions = position.writeOptionsTransactions 
   // writeOptionsTransactions.push(tradeId)
   // position.writeOptionsTransactions = writeOptionsTransactions
 
   if (isBuy) {
+    position.longAmount = position.longAmount.plus(amount)
     const optionsBoughtTransactions = position.optionsBoughtTransactions
     optionsBoughtTransactions.push(tradeId)
     position.optionsBoughtTransactions = optionsBoughtTransactions    
   } else if (!isBuy) {
+      position.shortAmount = position.shortAmount.minus(amount)
       const optionsSoldTransactions = position.optionsSoldTransactions
       optionsSoldTransactions.push(tradeId)
       position.optionsSoldTransactions = optionsSoldTransactions     
@@ -56,11 +58,14 @@ export function loadOrCreatePosition(user: Address, oToken: string): Position {
     position.account = user.toHex();
 
     position.oToken = oToken;
-    position.amount = BIGINT_ZERO;
+    position.netAmount = BIGINT_ZERO;
+    position.longAmount = BIGINT_ZERO;
+    position.shortAmount = BIGINT_ZERO;
     position.active = true;
     // position.writeOptionsTransactions = [];
     position.optionsBoughtTransactions = [];
     position.optionsSoldTransactions = [];
+    position.optionsTransferTransactions = [];
     // position.settleActions = [];
 
   }

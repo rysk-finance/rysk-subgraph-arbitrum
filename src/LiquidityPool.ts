@@ -13,7 +13,7 @@ import {
 } from "../generated/liquidityPool/liquidityPool"
 import { 
   BuybackOptionAction,
-  DailyStatSnapshot,
+  // DailyStatSnapshot,
   DepositAction, 
   InitiateWithdrawAction, 
   LPBalance,
@@ -121,16 +121,16 @@ export function handleWriteOption(event: WriteOption): void {
 
   // update total returns on daily snapshot
   // using the alpha launch timestamp to remove the test data 1664553600
-  if (timestamp.toI32() >= 1664553600 ) {
-    const dailyStatSnapshot = getDailySnapshot(timestamp)
-    dailyStatSnapshot.totalReturns = dailyStatSnapshot.totalReturns.plus(premium)
+  // if (timestamp.toI32() >= 1664553600 ) {
+    // const dailyStatSnapshot = getDailySnapshot(timestamp)
+    // dailyStatSnapshot.totalReturns = dailyStatSnapshot.totalReturns.plus(premium)
     // const totalAssets = lpContract.getAssets()
     // dailyStatSnapshot.totalAssets = totalAssets
     
-    dailyStatSnapshot.cumulativeYield = (dailyStatSnapshot.totalReturns.toBigDecimal())
-                                        .div(dailyStatSnapshot.totalAssets.toBigDecimal())
-    dailyStatSnapshot.save()
-  }
+    // dailyStatSnapshot.cumulativeYield = (dailyStatSnapshot.totalReturns.toBigDecimal())
+                                        // .div(dailyStatSnapshot.totalAssets.toBigDecimal())
+    // dailyStatSnapshot.save()
+  // }
 
 }
 
@@ -167,10 +167,10 @@ export function handleDepositEpochExecuted(event: DepositEpochExecuted): void {
   const totalAssets = lpContract.getAssets()
   const epoch = event.params.epoch
 
-  const dailyStatSnapshot = getDailySnapshot(timestamp)
-  dailyStatSnapshot.totalAssets = dailyStatSnapshot.totalReturns.plus(totalAssets)
-  dailyStatSnapshot.epoch = epoch
-  dailyStatSnapshot.save()
+  // const dailyStatSnapshot = getDailySnapshot(timestamp)
+  // dailyStatSnapshot.totalAssets = dailyStatSnapshot.totalReturns.plus(totalAssets)
+  // dailyStatSnapshot.epoch = epoch
+  // dailyStatSnapshot.save()
 
 }
 
@@ -182,10 +182,10 @@ export function handleWithdrawalEpochExecuted(event: WithdrawalEpochExecuted): v
   const totalAssets = lpContract.getAssets()
   const epoch = event.params.epoch
 
-  const dailyStatSnapshot = getDailySnapshot(timestamp)
-  dailyStatSnapshot.totalAssets = dailyStatSnapshot.totalReturns.plus(totalAssets)
-  dailyStatSnapshot.epoch = epoch
-  dailyStatSnapshot.save()
+  // const dailyStatSnapshot = getDailySnapshot(timestamp)
+  // dailyStatSnapshot.totalAssets = dailyStatSnapshot.totalReturns.plus(totalAssets)
+  // dailyStatSnapshot.epoch = epoch
+  // dailyStatSnapshot.save()
 
   const epochString = epoch.toString()
 
@@ -223,53 +223,53 @@ export function handleRebalancePortfolioDelta(event: RebalancePortfolioDelta): v
 
   const totalAssets = lpContract.getAssets()
 
-  const dailyStatSnapshot = getDailySnapshot(timestamp)
-  dailyStatSnapshot.totalAssets = dailyStatSnapshot.totalReturns.plus(totalAssets)
-  dailyStatSnapshot.save()
+  // const dailyStatSnapshot = getDailySnapshot(timestamp)
+  // dailyStatSnapshot.totalAssets = dailyStatSnapshot.totalReturns.plus(totalAssets)
+  // dailyStatSnapshot.save()
 
 }
 
 
-function getDailySnapshot(timestamp: BigInt): DailyStatSnapshot {
+// function getDailySnapshot(timestamp: BigInt): DailyStatSnapshot {
   
-  let dayID = timestamp.toI32() / 86400
-  let dayStartUnix = dayID * 86400
-  let dayStartUnixBigInt = BigInt.fromI32(dayStartUnix)
+//   let dayID = timestamp.toI32() / 86400
+//   let dayStartUnix = dayID * 86400
+//   let dayStartUnixBigInt = BigInt.fromI32(dayStartUnix)
 
-  let dailyStatSnapshot = DailyStatSnapshot.load('last')  
+//   let dailyStatSnapshot = DailyStatSnapshot.load('last')  
 
-  const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
+//   const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
 
-  if (dailyStatSnapshot === null) { 
-    dailyStatSnapshot = new DailyStatSnapshot('last')
-    dailyStatSnapshot.totalReturns  = BIGINT_ZERO
+//   if (dailyStatSnapshot === null) { 
+//     dailyStatSnapshot = new DailyStatSnapshot('last')
+//     dailyStatSnapshot.totalReturns  = BIGINT_ZERO
 
-    const totalAssets = lpContract.getAssets()
-    dailyStatSnapshot.totalAssets  = totalAssets
+//     const totalAssets = lpContract.getAssets()
+//     dailyStatSnapshot.totalAssets  = totalAssets
 
-    dailyStatSnapshot.cumulativeYield = BIGDECIMAL_ZERO
-    dailyStatSnapshot.epoch  = BIGINT_ZERO
-    dailyStatSnapshot.timestamp = dayStartUnixBigInt
-  }
+//     dailyStatSnapshot.cumulativeYield = BIGDECIMAL_ZERO
+//     dailyStatSnapshot.epoch  = BIGINT_ZERO
+//     dailyStatSnapshot.timestamp = dayStartUnixBigInt
+//   }
 
 
-  if (dailyStatSnapshot !== null && dailyStatSnapshot.timestamp.notEqual(dayStartUnixBigInt) ) {
-    const totalReturns = dailyStatSnapshot.totalReturns
-    const totalAssets = dailyStatSnapshot.totalAssets
-    const cumulativeYield = dailyStatSnapshot.cumulativeYield
-    const epoch = dailyStatSnapshot.epoch
+//   if (dailyStatSnapshot !== null && dailyStatSnapshot.timestamp.notEqual(dayStartUnixBigInt) ) {
+//     const totalReturns = dailyStatSnapshot.totalReturns
+//     const totalAssets = dailyStatSnapshot.totalAssets
+//     const cumulativeYield = dailyStatSnapshot.cumulativeYield
+//     const epoch = dailyStatSnapshot.epoch
     
-    dailyStatSnapshot.id = dailyStatSnapshot.timestamp.toString()
-    dailyStatSnapshot.save()
+//     dailyStatSnapshot.id = dailyStatSnapshot.timestamp.toString()
+//     dailyStatSnapshot.save()
     
-    dailyStatSnapshot = new DailyStatSnapshot('last')
-    dailyStatSnapshot.totalReturns  = totalReturns
-    dailyStatSnapshot.totalAssets  = totalAssets
-    dailyStatSnapshot.cumulativeYield  = cumulativeYield
-    dailyStatSnapshot.epoch  = epoch
-    dailyStatSnapshot.timestamp = dayStartUnixBigInt
-  }
+//     dailyStatSnapshot = new DailyStatSnapshot('last')
+//     dailyStatSnapshot.totalReturns  = totalReturns
+//     dailyStatSnapshot.totalAssets  = totalAssets
+//     dailyStatSnapshot.cumulativeYield  = cumulativeYield
+//     dailyStatSnapshot.epoch  = epoch
+//     dailyStatSnapshot.timestamp = dayStartUnixBigInt
+//   }
 
-  return dailyStatSnapshot as DailyStatSnapshot
+//   return dailyStatSnapshot as DailyStatSnapshot
 
-}
+// }
