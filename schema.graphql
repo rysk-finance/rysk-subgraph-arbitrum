@@ -56,6 +56,16 @@ type OptionsSoldAction @entity {
   transactionHash: String!
 }
 
+type OptionsTransferAction @entity {
+  id: ID!
+  otoken: OToken
+  amount: BigInt!
+  from: Bytes!
+  to: Bytes!
+  timestamp: BigInt!
+  transactionHash: String!
+}
+
 type WriteOptionsAction @entity {
   id: ID!
   otoken: OToken
@@ -85,14 +95,14 @@ type RebalanceDeltaAction @entity {
   reactorIndex: Int
 }
 
-type DailyStatSnapshot @entity {
-  id: ID!
-  timestamp: BigInt!
-  totalReturns: BigInt!
-  totalAssets: BigInt!
-  cumulativeYield: BigDecimal
-  epoch: BigInt
-}
+# type DailyStatSnapshot @entity {
+#   id: ID!
+#   timestamp: BigInt!
+#   totalReturns: BigInt!
+#   totalAssets: BigInt!
+#   cumulativeYield: BigDecimal
+#   epoch: BigInt
+# }
 
 type PricePerShare @entity {
   " Equals to ${epoch}"
@@ -209,10 +219,13 @@ type Position @entity {
 
   account: Account!
   oToken: OToken!
-  amount: BigInt!
+  netAmount: BigInt!
+  longAmount: BigInt!
+  shortAmount: BigInt!
   # writeOptionsTransactions: [WriteOptionsAction!]!
   optionsBoughtTransactions: [OptionsBoughtAction!]!
   optionsSoldTransactions: [OptionsSoldAction!]!
+  optionsTransferTransactions: [OptionsTransferAction!]!
 
   "Wheather this is an active or closed position."
   active: Boolean!
