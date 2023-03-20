@@ -23,6 +23,7 @@ export function handleTransfer(event: Transfer): void {
   const toAddress = event.params.to;
   const fromAddress = event.params.from;
 
+  // @todo Get these from AddressBook
   let excludedAddresses = [LIQUIDITY_POOL, OPTION_REGISTRY];
 
   // convert to 1e18 cause LP handleWriteOptions is 1e18

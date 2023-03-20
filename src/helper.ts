@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, Bytes, Address } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
 
 import { Account, Position } from "../generated/schema";
 
@@ -40,7 +40,7 @@ export function updateOptionPosition(
     optionsBoughtTransactions.push(tradeId);
     position.optionsBoughtTransactions = optionsBoughtTransactions;
   } else if (!isBuy) {
-    position.shortAmount = position.shortAmount.minus(amount);
+    position.shortAmount = position.shortAmount.plus(amount);
     const optionsSoldTransactions = position.optionsSoldTransactions;
     optionsSoldTransactions.push(tradeId);
     position.optionsSoldTransactions = optionsSoldTransactions;
