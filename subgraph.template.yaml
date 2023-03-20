@@ -140,7 +140,7 @@ dataSources:
         - CollateralAssetWithdrawed
         # - Redeem
         # - ShortOtokenBurned
-        # - ShortOtokenMinted
+        - ShortOtokenMinted
         - VaultOpened
         - VaultSettled
       abis:
@@ -155,8 +155,8 @@ dataSources:
         #   handler: handleRedeem
         # - event: ShortOtokenBurned(indexed address,indexed address,indexed address,uint256,uint256)
         #   handler: handleShortOtokenBurned
-        # - event: ShortOtokenMinted(indexed address,indexed address,indexed address,uint256,uint256)
-        #   handler: handleShortOtokenMinted
+        - event: ShortOtokenMinted(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleShortOtokenMinted
         - event: VaultOpened(indexed address,uint256,indexed uint256)
           handler: handleVaultOpened
         - event: VaultSettled(indexed address,indexed address,address,uint256,uint256,indexed uint256)

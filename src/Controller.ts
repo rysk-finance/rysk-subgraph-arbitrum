@@ -5,20 +5,19 @@ import {
   VaultLiquidated,
   VaultOpened,
   VaultSettled,
-} from '../generated/Controller/Controller';
+  ShortOtokenMinted
+} from "../generated/Controller/Controller";
+import { MintShortAction, Vault } from "../generated/schema";
 
-import { BIGINT_ZERO, loadOrCreateAccount, OPTION_REGISTRY } from './helper';
-
-import {
-  Vault
-} from '../generated/schema';
-
+import { BIGINT_ZERO, loadOrCreateAccount } from "./helper";
 
 /**
  * Vault Actions
  */
 
-export function handleCollateralAssetDeposited(event: CollateralAssetDeposited): void {
+export function handleCollateralAssetDeposited(
+  event: CollateralAssetDeposited
+): void {
   let accountId = event.params.accountOwner.toHex();
   let id = event.params.vaultId;
   let asset = event.params.asset;
@@ -26,16 +25,20 @@ export function handleCollateralAssetDeposited(event: CollateralAssetDeposited):
   let amount = event.params.amount;
 
   // update vault struct
-  let vaultId = accountId + '-' + id.toString();
+  let vaultId = accountId + "-" + id.toString();
   let vault = Vault.load(vaultId);
   if (vault) {
     vault.collateralAsset = asset.toHex();
-    vault.collateralAmount = vault.collateralAmount ? vault.collateralAmount!.plus(amount) : BIGINT_ZERO.plus(amount);
+    vault.collateralAmount = vault.collateralAmount
+      ? vault.collateralAmount!.plus(amount)
+      : BIGINT_ZERO.plus(amount);
     vault.save();
   }
 }
 
-export function handleCollateralAssetWithdrawed(event: CollateralAssetWithdrawed): void {
+export function handleCollateralAssetWithdrawed(
+  event: CollateralAssetWithdrawed
+): void {
   let accountId = event.params.AccountOwner.toHex();
   let id = event.params.vaultId;
   let asset = event.params.asset;
@@ -43,36 +46,40 @@ export function handleCollateralAssetWithdrawed(event: CollateralAssetWithdrawed
   let amount = event.params.amount;
 
   // update vault struct
-  let vaultId = accountId + '-' + id.toString();
+  let vaultId = accountId + "-" + id.toString();
   let vault = Vault.load(vaultId);
 
-  if (vault ) {
-    vault.collateralAsset = vault.collateralAmount!.minus(amount).isZero() ? null : asset.toHex();
+  if (vault) {
+    vault.collateralAsset = vault.collateralAmount!.minus(amount).isZero()
+      ? null
+      : asset.toHex();
     vault.collateralAmount = vault.collateralAmount!.minus(amount);
 
     vault.save();
   }
-
 }
 
-export function handleLiquidation(event: VaultLiquidated):void {
+export function handleLiquidation(event: VaultLiquidated): void {
   let accountId = event.params.vaultOwner.toHex();
   let id = event.params.vaultId;
-  
-  let collateralPayout = event.params.collateralPayout
-  let debtAmount = event.params.debtAmount
+
+  let collateralPayout = event.params.collateralPayout;
+  let debtAmount = event.params.debtAmount;
 
   // update vault struct
-  let vaultId = accountId + '-' + id.toString();
+  let vaultId = accountId + "-" + id.toString();
   let vault = Vault.load(vaultId);
   if (vault) {
-    vault.shortAmount = vault.shortAmount ? vault.shortAmount!.minus(debtAmount) : BIGINT_ZERO;
-    vault.collateralAmount = vault.collateralAmount ? vault.collateralAmount!.minus(collateralPayout) : BIGINT_ZERO;
+    vault.shortAmount = vault.shortAmount
+      ? vault.shortAmount!.minus(debtAmount)
+      : BIGINT_ZERO;
+    vault.collateralAmount = vault.collateralAmount
+      ? vault.collateralAmount!.minus(collateralPayout)
+      : BIGINT_ZERO;
 
     vault.save();
   }
 }
-
 
 export function handleVaultOpened(event: VaultOpened): void {
   let accountId = event.params.accountOwner.toHex();
@@ -83,7 +90,7 @@ export function handleVaultOpened(event: VaultOpened): void {
   account.vaultCount = account.vaultCount.plus(BigInt.fromI32(1));
   account.save();
 
-  let vaultId = accountId + '-' + id.toString();
+  let vaultId = accountId + "-" + id.toString();
   let vault = new Vault(vaultId);
   vault.owner = accountId;
   vault.vaultId = id;
@@ -97,12 +104,11 @@ export function handleVaultSettled(event: VaultSettled): void {
   let id = event.params.vaultId;
   let accountId = event.params.accountOwner.toHex();
 
-  let vaultId = accountId + '-' + id.toString();
-  
+  let vaultId = accountId + "-" + id.toString();
+
   let vault = Vault.load(vaultId);
 
   if (vault) {
-
     // update vault struct
     vault.collateralAsset = null;
     vault.collateralAmount = BIGINT_ZERO;
@@ -111,7 +117,50 @@ export function handleVaultSettled(event: VaultSettled): void {
     vault.longOToken = null;
     vault.longAmount = BIGINT_ZERO;
     vault.save();
+  }
+}
 
-  } 
+export function handleShortOtokenMinted(event: ShortOtokenMinted): void {
+  let accountId = event.params.AccountOwner.toHex();
+  let id = event.params.vaultId;
+  let asset = event.params.otoken;
+  let to = event.params.to;
+  let amount = event.params.amount;
 
+  // update vault struct
+  let vaultId = accountId + "-" + id.toString();
+
+  // Yassine - Opyn doesn't have !, due to breaking changes from AS 0.0.4 to 0.07
+  let vault = Vault.load(vaultId)!;
+
+  const shortAmount = vault.shortAmount;
+
+  vault.shortOToken = asset.toHex(); // convert to id
+  // if this is the first time creating a short position, mark the timestamp
+  if (!shortAmount || (shortAmount && shortAmount.isZero())) {
+    //  (!vault.shortAmount || vault.shortAmount.isZero()) {
+    vault.firstMintTimestamp = event.block.timestamp;
+  }
+
+  // Yassine - Opyn doesn't have !, due to breaking changes from AS 0.0.4 to 0.07
+  vault.shortAmount = shortAmount ? shortAmount.plus(amount) : amount;
+  vault.save();
+
+  // create action entity
+  let actionId =
+    "MINT-SHORT-" +
+    event.transaction.hash.toHex() +
+    "-" +
+    event.logIndex.toString();
+  let action = new MintShortAction(actionId);
+  action.messageSender = event.transaction.from;
+  action.vault = vaultId;
+  action.block = event.block.number;
+  action.transactionHash = event.transaction.hash;
+  action.timestamp = event.block.timestamp;
+  // MintShort fields
+  action.to = to;
+  action.oToken = asset.toHex();
+  action.amount = amount;
+  action.save();
 }

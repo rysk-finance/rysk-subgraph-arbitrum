@@ -265,6 +265,23 @@ interface VaultAction {
   timestamp: BigInt!
 }
 
+type MintShortAction implements VaultAction @entity {
+  # Vault fields
+  id: ID!
+  messageSender: Bytes!
+  vault: Vault!
+  block: BigInt!
+  transactionHash: Bytes!
+  timestamp: BigInt!
+
+  " Create oToken to"
+  to: Bytes!
+  " OToken asset"
+  oToken: OToken!
+  " Amount added in the vault"
+  amount: BigInt!
+}
+
 type WhitelistedProduct @entity {
   id: ID!
   underlying: ERC20!
