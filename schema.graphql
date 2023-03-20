@@ -160,6 +160,9 @@ type Account @entity {
   "Amount of vaults this account has"
   vaultCount: BigInt!
 
+  "Array of all vaults"
+  vaults: [Vault!]! @derivedFrom(field: "owner")
+
   balances: [AccountBalance!]! @derivedFrom(field: "account")
   positions: [Position!]! @derivedFrom(field: "account")
 }
