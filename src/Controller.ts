@@ -11,8 +11,8 @@ import {
 import {
   MintShortAction,
   Vault,
-  RedeemAction
-  // SettleAction
+  RedeemAction,
+  SettleAction
 } from "../generated/schema";
 
 import {
@@ -20,8 +20,8 @@ import {
   BIGINT_ZERO,
   loadOrCreateAccount,
   loadOrCreatePosition,
-  updateRedeemerPosition
-  // updateSettlerPosition
+  updateRedeemerPosition,
+  updateSettlerPosition
 } from "./helper";
 
 /**
@@ -118,10 +118,33 @@ export function handleVaultSettled(event: VaultSettled): void {
   let accountId = event.params.accountOwner.toHex();
 
   let vaultId = accountId + "-" + id.toString();
-
   let vault = Vault.load(vaultId);
 
   if (vault) {
+    // create action entity
+    let actionId =
+      "SETTLE-" +
+      event.transaction.hash.toHex() +
+      "-" +
+      event.logIndex.toString();
+    let action = new SettleAction(actionId);
+    action.messageSender = event.transaction.from;
+    action.vault = vaultId;
+    action.block = event.block.number;
+    action.transactionHash = event.transaction.hash;
+    action.timestamp = event.block.timestamp;
+
+    action.long = vault.longOToken;
+    action.short = vault.shortOToken;
+    action.longAmount = vault.longAmount;
+    action.shortAmount = vault.shortAmount;
+    action.collateral = vault.collateralAsset;
+    action.collateralAmount = vault.collateralAmount;
+
+    action.to = event.params.to;
+    action.amount = event.params.payout;
+    action.save();
+
     // update vault struct
     vault.collateralAsset = null;
     vault.collateralAmount = BIGINT_ZERO;
@@ -130,6 +153,18 @@ export function handleVaultSettled(event: VaultSettled): void {
     vault.longOToken = null;
     vault.longAmount = BIGINT_ZERO;
     vault.save();
+
+    const ryskAmount = assert(
+      action.shortAmount,
+      "shortAmount can't be null"
+    ).times(BigInt.fromString("10000000000"));
+
+    updateSettlerPosition(
+      event.params.accountOwner, // settler not .to because .to is the address that receives the payout
+      event.params.oTokenAddress.toHex(), // settling short oToken
+      ryskAmount, // NOTE: settling 0s user's short position
+      action.id
+    );
   }
 }
 

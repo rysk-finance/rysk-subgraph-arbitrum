@@ -71,6 +71,8 @@ export function loadOrCreatePosition(
     account.save();
     position.account = user.toHex();
 
+    position.settleActions = [];
+
     position.oToken = oToken;
     position.netAmount = BIGINT_ZERO;
     position.longAmount = BIGINT_ZERO;

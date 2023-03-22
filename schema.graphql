@@ -235,6 +235,10 @@ type Position @entity {
   # Transfers between users
   optionsTransferTransactions: [OptionsTransferAction!]!
 
+  "vault settle actions (payout)"
+  settleActions: [SettleAction!]!
+
+
   "Wheather this is an active or closed position."
   active: Boolean!
 }
@@ -326,4 +330,36 @@ type WhitelistedProduct @entity {
   collateral: ERC20!
   isPut: Boolean!
   isWhitelisted: Boolean!
+}
+
+type SettleAction implements VaultAction @entity {
+  # Vault fields
+  id: ID!
+  messageSender: Bytes!
+  vault: Vault!
+  block: BigInt!
+  transactionHash: Bytes!
+  timestamp: BigInt!
+
+  "the asset that payout was denominated in. (Should be the collateral of the token)"
+  collateral: ERC20
+
+  "original collateral in the vault"
+  collateralAmount: BigInt
+
+  " Payout to to"
+  to: Bytes!
+
+  "long oToken"
+  long: OToken
+
+  longAmount: BigInt
+
+  "short oToken"
+  short: OToken
+
+  shortAmount: BigInt
+
+  " Amount payout"
+  amount: BigInt!
 }
