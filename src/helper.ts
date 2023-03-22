@@ -80,7 +80,7 @@ export function loadOrCreatePosition(
     position.optionsBoughtTransactions = [];
     position.optionsSoldTransactions = [];
     position.optionsTransferTransactions = [];
-    // position.settleActions = [];
+    position.redeemActions = [];
   }
   return position as Position;
 }
