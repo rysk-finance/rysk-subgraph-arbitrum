@@ -239,4 +239,26 @@ export function handleShortOtokenMinted(event: ShortOtokenMinted): void {
   action.oToken = asset.toHex();
   action.amount = amount;
   action.save();
+
+  // add vault to trader's position
+  let initPositionId = BIGINT_ZERO;
+
+  let position = loadOrCreatePosition(
+    event.params.AccountOwner,
+    action.oToken,
+    initPositionId
+  );
+
+  // get the first active position for this otoken.
+  while (!position.active) {
+    initPositionId = initPositionId.plus(BIGINT_ONE);
+    position = loadOrCreatePosition(
+      event.params.AccountOwner,
+      action.oToken,
+      initPositionId
+    );
+  }
+
+  position.vault = vaultId;
+  position.save();
 }

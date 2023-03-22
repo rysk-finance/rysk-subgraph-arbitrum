@@ -241,6 +241,9 @@ type Position @entity {
 
   "Wheather this is an active or closed position."
   active: Boolean!
+
+  "Vault that this position is associated with."
+  vault: Vault
 }
 
 type Vault @entity {
