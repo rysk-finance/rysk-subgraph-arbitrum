@@ -94,3 +94,104 @@ export function loadOrCreateAccount(accountId: string): Account {
   }
   return account as Account;
 }
+
+export function updateBuyerPosition(
+  buyer: Address,
+  oToken: string,
+  amount: BigInt,
+  tradeId: string
+): void {
+  let initPositionId = BIGINT_ZERO;
+  let position = loadOrCreatePosition(buyer, oToken, initPositionId);
+  // get the first active position for this otoken.
+  while (!position.active) {
+    initPositionId = initPositionId.plus(BIGINT_ONE);
+    position = loadOrCreatePosition(buyer, oToken, initPositionId);
+  }
+  position.netAmount = position.netAmount.plus(amount);
+  position.longAmount = position.longAmount.plus(amount);
+  // set position to inactive (closed) whenever we get back to zero longs and shorts
+  if (position.longAmount.isZero() && position.shortAmount.isZero())
+    position.active = false;
+
+  let transactions = position.optionsTransferTransactions;
+  transactions.push(tradeId);
+  position.optionsTransferTransactions = transactions;
+  position.save();
+}
+
+export function updateSellerPosition(
+  seller: Address,
+  oToken: string,
+  amount: BigInt,
+  tradeId: string
+): void {
+  let initPositionId = BIGINT_ZERO;
+  let position = loadOrCreatePosition(seller, oToken, initPositionId);
+  // get the first active position for this otoken.
+  while (!position.active) {
+    initPositionId = initPositionId.plus(BIGINT_ONE);
+    position = loadOrCreatePosition(seller, oToken, initPositionId);
+  }
+  position.netAmount = position.netAmount.minus(amount);
+  position.longAmount = position.longAmount.minus(amount);
+  // set position to inactive (closed) whenever we get back to zero longs and shorts
+  if (position.longAmount.isZero() && position.shortAmount.isZero())
+    position.active = false;
+
+  let transactions = position.optionsTransferTransactions;
+  transactions.push(tradeId);
+  position.optionsTransferTransactions = transactions;
+  position.save();
+}
+
+export function updateRedeemerPosition(
+  redeemer: Address,
+  oToken: string,
+  amount: BigInt,
+  tradeId: string
+): void {
+  let initPositionId = BIGINT_ZERO;
+  let position = loadOrCreatePosition(redeemer, oToken, initPositionId);
+  // get the first active position for this otoken.
+  while (!position.active) {
+    initPositionId = initPositionId.plus(BIGINT_ONE);
+    position = loadOrCreatePosition(redeemer, oToken, initPositionId);
+  }
+  position.netAmount = position.netAmount.minus(amount);
+  position.longAmount = position.longAmount.minus(amount);
+  // set position to inactive (closed) whenever we get back to zero longs and shorts
+  if (position.longAmount.isZero() && position.shortAmount.isZero())
+    position.active = false;
+
+  let redeemActions = position.redeemActions;
+  redeemActions.push(tradeId);
+  position.redeemActions = redeemActions;
+  position.save();
+}
+
+export function updateSettlerPosition(
+  settler: Address,
+  oToken: string,
+  amount: BigInt,
+  settleId: string
+): void {
+  let initPositionId = BIGINT_ZERO;
+  let position = loadOrCreatePosition(settler, oToken, initPositionId);
+  // get the first active position for this otoken.
+  while (!position.active) {
+    initPositionId = initPositionId.plus(BIGINT_ONE);
+    position = loadOrCreatePosition(settler, oToken, initPositionId);
+  }
+
+  position.netAmount = position.netAmount.plus(amount);
+  position.longAmount = position.shortAmount.minus(amount);
+  // set position to inactive (closed) whenever we get back to zero longs and shorts
+  if (position.longAmount.isZero() && position.shortAmount.isZero())
+    position.active = false;
+
+  let settleActions = position.settleActions;
+  settleActions.push(settleId);
+  position.settleActions = settleActions;
+  position.save();
+}
