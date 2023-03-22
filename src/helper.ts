@@ -35,8 +35,9 @@ export function updateOptionPosition(
   position.netAmount = isBuy
     ? position.netAmount.plus(amount)
     : position.netAmount.minus(amount);
-  // set position to inactive (closed) whenever we get back to amount = 0
-  if (position.netAmount.isZero()) position.active = false;
+  // set position to inactive (closed) whenever we get back to zero longs and shorts
+  if (position.longAmount.isZero() && position.shortAmount.isZero())
+    position.active = false;
 
   // let writeOptionsTransactions = position.writeOptionsTransactions
   // writeOptionsTransactions.push(tradeId)
