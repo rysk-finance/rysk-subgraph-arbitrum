@@ -10,8 +10,9 @@ import {
   BIGINT_ZERO,
   LIQUIDITY_POOL,
   loadOrCreateAccount,
-  loadOrCreatePosition,
   OPTION_REGISTRY,
+  updateBuyerPosition,
+  updateSellerPosition,
   ZERO_ADDRESS
 } from "./helper";
 
@@ -66,28 +67,6 @@ export function handleTransfer(event: Transfer): void {
         excludedAddresses.includes(fromAddress.toHex())
       )
     ) {
-      let sourceAccountPosition = loadOrCreatePosition(
-        fromAddress,
-        event.address.toHex()
-      );
-      sourceAccountPosition.netAmount = sourceAccountPosition.netAmount.minus(
-        amountLP
-      );
-      sourceAccountPosition.longAmount = sourceAccountPosition.longAmount.minus(
-        amountLP
-      );
-
-      let destinationAccountPosition = loadOrCreatePosition(
-        toAddress,
-        event.address.toHex()
-      );
-      destinationAccountPosition.netAmount = destinationAccountPosition.netAmount.plus(
-        amountLP
-      );
-      destinationAccountPosition.longAmount = destinationAccountPosition.longAmount.plus(
-        amountLP
-      );
-
       const optionsTransferTransaction = new OptionsTransferAction(
         event.transaction.hash.toHex()
       );
@@ -101,22 +80,19 @@ export function handleTransfer(event: Transfer): void {
 
       optionsTransferTransaction.save();
 
-      const sourceAccountOptionsTransferTransactions =
-        sourceAccountPosition.optionsTransferTransactions;
-      sourceAccountOptionsTransferTransactions.push(
-        event.transaction.hash.toHex()
+      updateBuyerPosition(
+        toAddress,
+        event.address.toHex(),
+        amountLP,
+        optionsTransferTransaction.id
       );
-      sourceAccountPosition.optionsTransferTransactions = sourceAccountOptionsTransferTransactions;
 
-      const destinationAccountOptionsTransferTransactions =
-        destinationAccountPosition.optionsTransferTransactions;
-      destinationAccountOptionsTransferTransactions.push(
-        event.transaction.hash.toHex()
+      updateSellerPosition(
+        fromAddress,
+        event.address.toHex(),
+        amountLP,
+        optionsTransferTransaction.id
       );
-      destinationAccountPosition.optionsTransferTransactions = destinationAccountOptionsTransferTransactions;
-
-      sourceAccountPosition.save();
-      destinationAccountPosition.save();
     }
   }
 }
