@@ -22,7 +22,15 @@ export function updateOptionPosition(
   amount: BigInt,
   tradeId: string
 ): void {
-  let position = loadOrCreatePosition(trader, oToken);
+  let initPositionId = BIGINT_ZERO;
+
+  let position = loadOrCreatePosition(trader, oToken, initPositionId);
+
+  // get the first active position for this otoken.
+  while (!position.active) {
+    initPositionId = initPositionId.plus(BIGINT_ONE);
+    position = loadOrCreatePosition(trader, oToken, initPositionId);
+  }
 
   position.netAmount = isBuy
     ? position.netAmount.plus(amount)
@@ -49,8 +57,12 @@ export function updateOptionPosition(
   position.save();
 }
 
-export function loadOrCreatePosition(user: Address, oToken: string): Position {
-  let id = user.toHex() + "-" + oToken;
+export function loadOrCreatePosition(
+  user: Address,
+  oToken: string,
+  numId: BigInt
+): Position {
+  let id = user.toHex() + "-" + oToken + "-" + numId.toString();
   let position = Position.load(id);
   if (position == null) {
     position = new Position(id);

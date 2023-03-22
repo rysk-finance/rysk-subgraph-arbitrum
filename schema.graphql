@@ -217,7 +217,7 @@ type OToken @entity {
 }
 
 type Position @entity {
-  "Equals to <account>-<oToken>"
+  "Equals to <account>-<oToken>-<id>"
   id: ID!
 
   account: Account!
