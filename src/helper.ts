@@ -35,9 +35,6 @@ export function updateOptionPosition(
   position.netAmount = isBuy
     ? position.netAmount.plus(amount)
     : position.netAmount.minus(amount);
-  // set position to inactive (closed) whenever we get back to zero longs and shorts
-  if (position.longAmount.isZero() && position.shortAmount.isZero())
-    position.active = false;
 
   // let writeOptionsTransactions = position.writeOptionsTransactions
   // writeOptionsTransactions.push(tradeId)
@@ -54,6 +51,10 @@ export function updateOptionPosition(
     optionsSoldTransactions.push(tradeId);
     position.optionsSoldTransactions = optionsSoldTransactions;
   }
+
+  // set position to inactive (closed) whenever we get back to zero longs and shorts
+  if (position.longAmount.isZero() && position.shortAmount.isZero())
+    position.active = false;
 
   position.save();
 }
@@ -188,7 +189,7 @@ export function updateSettlerPosition(
   }
 
   position.netAmount = position.netAmount.plus(amount);
-  position.longAmount = position.shortAmount.minus(amount);
+  position.shortAmount = position.shortAmount.minus(amount);
   // set position to inactive (closed) whenever we get back to zero longs and shorts
   if (position.longAmount.isZero() && position.shortAmount.isZero())
     position.active = false;
