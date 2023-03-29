@@ -297,6 +297,25 @@ type MintShortAction implements VaultAction @entity {
   amount: BigInt!
 }
 
+
+type BurnShortAction implements VaultAction @entity {
+  # Vault fields
+  id: ID!
+  messageSender: Bytes!
+  vault: Vault!
+  block: BigInt!
+  transactionHash: Bytes!
+  timestamp: BigInt!
+
+  # Specific field
+  " oToken holder, either account or operator"
+  from: Bytes!
+  " oToken Asset"
+  oToken: OToken!
+  " Amount added in the vault"
+  amount: BigInt!
+}
+
 type RedeemAction @entity {
   "REDEEM-TxHash-logIndex"
   id: ID!
