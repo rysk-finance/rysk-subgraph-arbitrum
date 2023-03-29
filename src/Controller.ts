@@ -6,10 +6,12 @@ import {
   VaultOpened,
   VaultSettled,
   ShortOtokenMinted,
+  ShortOtokenBurned,
   Redeem
 } from "../generated/Controller/Controller";
 import {
   MintShortAction,
+  BurnShortAction,
   Vault,
   RedeemAction,
   SettleAction
@@ -261,4 +263,43 @@ export function handleShortOtokenMinted(event: ShortOtokenMinted): void {
 
   position.vault = vaultId;
   position.save();
+}
+
+export function handleShortOtokenBurned(event: ShortOtokenBurned): void {
+  let accountId = event.params.AccountOwner.toHex();
+  let id = event.params.vaultId;
+  let asset = event.params.otoken;
+  let from = event.params.from;
+  let amount = event.params.amount;
+
+  // update vault struct
+  let vaultId = accountId + "-" + id.toString();
+  let vault = Vault.load(vaultId)!;
+
+  const shortAmount = vault.shortAmount;
+
+  // if amount = 0, set the longOtoken back to null
+  vault.shortOToken =
+    shortAmount && shortAmount.minus(amount).isZero() ? null : asset.toHex(); // convert to id
+  vault.shortAmount = shortAmount && shortAmount.minus(amount);
+
+  vault.save();
+
+  // create action entity
+  let actionId =
+    "BURN-SHORT-" +
+    event.transaction.hash.toHex() +
+    "-" +
+    event.logIndex.toString();
+  let action = new BurnShortAction(actionId);
+  action.messageSender = event.transaction.from;
+  action.vault = vaultId;
+  action.block = event.block.number;
+  action.transactionHash = event.transaction.hash;
+  action.timestamp = event.block.timestamp;
+  // DepositLong fields
+  action.from = from;
+  action.oToken = asset.toHex();
+  action.amount = amount;
+  action.save();
 }
