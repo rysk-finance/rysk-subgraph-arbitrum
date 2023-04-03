@@ -21,7 +21,7 @@ import {
   BIGINT_ONE,
   BIGINT_ZERO,
   loadOrCreateAccount,
-  loadOrCreatePosition,
+  loadOrCreateShortPosition,
   updateRedeemerPosition,
   updateSettlerPosition
 } from "./helper";
@@ -245,7 +245,7 @@ export function handleShortOtokenMinted(event: ShortOtokenMinted): void {
   // add vault to trader's position
   let initPositionId = BIGINT_ZERO;
 
-  let position = loadOrCreatePosition(
+  let position = loadOrCreateShortPosition(
     event.params.AccountOwner,
     action.oToken,
     initPositionId
@@ -254,7 +254,7 @@ export function handleShortOtokenMinted(event: ShortOtokenMinted): void {
   // get the first active position for this otoken.
   while (!position.active) {
     initPositionId = initPositionId.plus(BIGINT_ONE);
-    position = loadOrCreatePosition(
+    position = loadOrCreateShortPosition(
       event.params.AccountOwner,
       action.oToken,
       initPositionId

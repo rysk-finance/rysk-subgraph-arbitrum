@@ -164,7 +164,8 @@ type Account @entity {
   vaults: [Vault!]! @derivedFrom(field: "owner")
 
   balances: [AccountBalance!]! @derivedFrom(field: "account")
-  positions: [Position!]! @derivedFrom(field: "account")
+  longPositions: [LongPosition!]! @derivedFrom(field: "account")
+  shortPositions: [ShortPosition!]! @derivedFrom(field: "account")
 }
 
 type AccountBalance @entity {
@@ -216,8 +217,8 @@ type OToken @entity {
   totalSupply: BigInt!
 }
 
-type Position @entity {
-  "Equals to <account>-<oToken>-<id>"
+type LongPosition @entity {
+  "Equals to <account>-<oToken>-l-<id>"
   id: ID!
 
   "holder redeem actions (payout)"
@@ -226,8 +227,8 @@ type Position @entity {
   account: Account!
   oToken: OToken!
   netAmount: BigInt!
-  longAmount: BigInt!
-  shortAmount: BigInt!
+  buyAmount: BigInt!
+  sellAmount: BigInt!
   # writeOptionsTransactions: [WriteOptionsAction!]!
   # Transactions with Rysk Option Exchange
   optionsBoughtTransactions: [OptionsBoughtAction!]!
@@ -235,9 +236,27 @@ type Position @entity {
   # Transfers between users
   optionsTransferTransactions: [OptionsTransferAction!]!
 
+  "Wheather this is an active or closed position."
+  active: Boolean!
+}
+
+type ShortPosition @entity {
+  "Equals to <account>-<oToken>-s-<id>"
+  id: ID!
+
+  account: Account!
+  oToken: OToken!
+
+  netAmount: BigInt!
+  buyAmount: BigInt!
+  sellAmount: BigInt!
+
+  # Transactions with Rysk Option Exchange
+  optionsBoughtTransactions: [OptionsBoughtAction!]!
+  optionsSoldTransactions: [OptionsSoldAction!]!
+
   "vault settle actions (payout)"
   settleActions: [SettleAction!]!
-
 
   "Wheather this is an active or closed position."
   active: Boolean!

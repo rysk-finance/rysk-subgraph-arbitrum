@@ -2,15 +2,21 @@ import { CollateralApprovalChanged } from "../generated/OptionExchange/OptionExc
 import {
   OptionsBought,
   OptionsSold
-} from '../generated/OptionExchange/OptionExchange';
+} from "../generated/OptionExchange/OptionExchange";
 
 import {
   OptionsBoughtAction,
   OptionsSoldAction,
   Collateral
-} from '../generated/schema';
+} from "../generated/schema";
 
-import { updateOptionPosition } from './helper';
+import {
+  CONTROLLER,
+  SHORT_OTOKEN_BURNED,
+  SHORT_OTOKEN_MINTED,
+  updateOptionLongPosition,
+  updateOptionShortPosition
+} from "./helper";
 
 export function handleCollateralApprovalChanged(
   event: CollateralApprovalChanged
@@ -34,47 +40,81 @@ export function handleCollateralApprovalChanged(
 }
 
 export function handleOptionsBought(event: OptionsBought): void {
+  const id = event.transaction.hash.toHex();
 
-  const id = event.transaction.hash.toHex()
-  const buyer = event.params.buyer
-  const otoken = event.params.series.toHex()
-  const amount = event.params.optionAmount
+  const receipt = event.receipt;
+  const txLogs = receipt ? receipt.logs : [];
 
-  const optionsBoughtAction = new OptionsBoughtAction(id)
+  const buyer = event.params.buyer;
+  const otoken = event.params.series.toHex();
+  const amount = event.params.optionAmount;
 
-  optionsBoughtAction.otoken = otoken
-  optionsBoughtAction.buyer = buyer
-  optionsBoughtAction.amount = amount
-  optionsBoughtAction.premium = event.params.premium
-  optionsBoughtAction.fee = event.params.fee
-  optionsBoughtAction.timestamp = event.block.timestamp
-  optionsBoughtAction.transactionHash = event.transaction.hash.toHex()
+  const optionsBoughtAction = new OptionsBoughtAction(id);
 
-  optionsBoughtAction.save()
+  optionsBoughtAction.otoken = otoken;
+  optionsBoughtAction.buyer = buyer;
+  optionsBoughtAction.amount = amount;
+  optionsBoughtAction.premium = event.params.premium;
+  optionsBoughtAction.fee = event.params.fee;
+  optionsBoughtAction.timestamp = event.block.timestamp;
+  optionsBoughtAction.transactionHash = event.transaction.hash.toHex();
 
-  updateOptionPosition(true, buyer, otoken, amount, id)
+  optionsBoughtAction.save();
 
+  for (let i = 0; i < txLogs.length; ++i) {
+    // if event is to Controller, avoid reading all events
+    if (txLogs[i].address.toHexString() == CONTROLLER) {
+      // if topic is ShortOtokenBurned and account owner is tx sender (trader)
+      if (
+        txLogs[i].topics[0].toHexString() == SHORT_OTOKEN_BURNED &&
+        txLogs[i].topics[2].toHexString().slice(26) ==
+          event.transaction.from.toHexString().slice(2)
+      ) {
+        // if topic is shortOTokenBurned and account owner is tx sender (trader)
+        updateOptionShortPosition(true, buyer, otoken, amount, id);
+        return;
+      }
+    }
+  }
+  updateOptionLongPosition(true, buyer, otoken, amount, id);
 }
 
 export function handleOptionsSold(event: OptionsSold): void {
+  const id = event.transaction.hash.toHex();
 
-  const id = event.transaction.hash.toHex()
-  const seller = event.params.seller
-  const otoken = event.params.series.toHex()
-  const amount = event.params.optionAmount
+  const receipt = event.receipt;
+  const txLogs = receipt ? receipt.logs : [];
 
-  const optionsSoldAction = new OptionsSoldAction(id)
+  const seller = event.params.seller;
+  const otoken = event.params.series.toHex();
+  const amount = event.params.optionAmount;
 
-  optionsSoldAction.otoken = otoken
-  optionsSoldAction.seller = seller
-  optionsSoldAction.amount = amount
-  optionsSoldAction.premium = event.params.premium
-  optionsSoldAction.fee = event.params.fee
-  optionsSoldAction.timestamp = event.block.timestamp
-  optionsSoldAction.transactionHash = event.transaction.hash.toHex()
+  const optionsSoldAction = new OptionsSoldAction(id);
 
-  optionsSoldAction.save()
+  optionsSoldAction.otoken = otoken;
+  optionsSoldAction.seller = seller;
+  optionsSoldAction.amount = amount;
+  optionsSoldAction.premium = event.params.premium;
+  optionsSoldAction.fee = event.params.fee;
+  optionsSoldAction.timestamp = event.block.timestamp;
+  optionsSoldAction.transactionHash = event.transaction.hash.toHex();
 
-  updateOptionPosition(false, seller, otoken, amount, id)
+  optionsSoldAction.save();
 
+  for (let i = 0; i < txLogs.length; ++i) {
+    // if event is to Controller, avoid reading all events
+    if (txLogs[i].address.toHexString() == CONTROLLER) {
+      // if topic is ShortOtokenMinted and account owner is tx sender (trader)
+      if (
+        txLogs[i].topics[0].toHexString() == SHORT_OTOKEN_MINTED &&
+        txLogs[i].topics[2].toHexString().slice(26) ==
+          event.transaction.from.toHexString().slice(2)
+      ) {
+        // if topic is shortOtokenMinted and account owner is tx sender (trader)
+        updateOptionShortPosition(false, seller, otoken, amount, id);
+        return;
+      }
+    }
+  }
+  updateOptionLongPosition(false, seller, otoken, amount, id);
 }
