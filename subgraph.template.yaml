@@ -67,8 +67,10 @@ dataSources:
       eventHandlers:
         - event: OptionsBought(indexed address,indexed address,uint256,uint256,uint256)
           handler: handleOptionsBought
+          receipt: true
         - event: OptionsSold(indexed address,indexed address,uint256,uint256,uint256)
           handler: handleOptionsSold
+          receipt: true
         - event: CollateralApprovalChanged(indexed address,bool,bool)
           handler: handleCollateralApprovalChanged
       file: ./src/optionExchange.ts
