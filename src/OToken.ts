@@ -10,6 +10,7 @@ import {
   BIGINT_ZERO,
   LIQUIDITY_POOL,
   loadOrCreateAccount,
+  OPTION_EXCHANGE,
   OPTION_REGISTRY,
   updateBuyerPosition,
   updateSellerPosition,
@@ -25,7 +26,7 @@ export function handleTransfer(event: Transfer): void {
   const fromAddress = event.params.from;
 
   // @todo Get these from AddressBook
-  let excludedAddresses = [LIQUIDITY_POOL, OPTION_REGISTRY];
+  let excludedAddresses = [LIQUIDITY_POOL, OPTION_REGISTRY, OPTION_EXCHANGE];
 
   // convert to 1e18 cause LP handleWriteOptions is 1e18
   const amountLP = amount.times(BigInt.fromString("10000000000"));
@@ -60,7 +61,7 @@ export function handleTransfer(event: Transfer): void {
     destinationAccount.balance = destinationAccount.balance.plus(amount);
     destinationAccount.save();
 
-    // exclude txs with options registry and liquidity pool since already handled by OptionsSold and Options Bought
+    // exclude txs with options registry, exchange and liquidity pool since already handled by OptionsSold and Options Bought
     if (
       !(
         excludedAddresses.includes(toAddress.toHex()) ||
