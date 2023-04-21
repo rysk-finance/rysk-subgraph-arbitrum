@@ -257,9 +257,9 @@ dataSources:
         - name: OptionCatalogue
           file: ./abis/OptionCatalogue.json
       eventHandlers:
-        - event: SeriesApproved(uint64,uint128,bool,bool,bool)
+        - event: SeriesApproved(indexed bytes32,uint64,uint128,bool,bool,bool)
           handler: handleSeriesApproved
-        - event: SeriesAltered(uint64,uint128,bool,bool,bool)
+        - event: SeriesAltered(indexed bytes32,uint64,uint128,bool,bool,bool)
           handler: handleSeriesAltered
       file: ./src/OptionCatalogue.ts
 
