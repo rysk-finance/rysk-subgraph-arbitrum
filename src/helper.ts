@@ -27,7 +27,8 @@ export function updateOptionLongPosition(
   trader: Address,
   oToken: string,
   amount: BigInt,
-  tradeId: string
+  tradeId: string,
+  total: BigInt
 ): void {
   let initPositionId = BIGINT_ZERO;
 
@@ -42,6 +43,10 @@ export function updateOptionLongPosition(
   position.netAmount = isBuy
     ? position.netAmount.plus(amount)
     : position.netAmount.minus(amount);
+
+  position.realizedPnl = isBuy
+    ? position.realizedPnl.minus(total)
+    : position.realizedPnl.plus(total);
 
   if (isBuy) {
     position.buyAmount = position.buyAmount.plus(amount);
@@ -66,7 +71,8 @@ export function updateOptionShortPosition(
   trader: Address,
   oToken: string,
   amount: BigInt,
-  tradeId: string
+  tradeId: string,
+  total: BigInt
 ): void {
   let initPositionId = BIGINT_ZERO;
 
@@ -81,6 +87,10 @@ export function updateOptionShortPosition(
   position.netAmount = isBuy
     ? position.netAmount.plus(amount)
     : position.netAmount.minus(amount);
+
+  position.realizedPnl = isBuy
+    ? position.realizedPnl.minus(total)
+    : position.realizedPnl.plus(total);
 
   if (isBuy) {
     position.buyAmount = position.buyAmount.plus(amount);

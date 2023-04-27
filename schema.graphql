@@ -229,6 +229,7 @@ type LongPosition @entity {
   netAmount: BigInt!
   buyAmount: BigInt!
   sellAmount: BigInt!
+  realizedPnl: BigInt!
   # writeOptionsTransactions: [WriteOptionsAction!]!
   # Transactions with Rysk Option Exchange
   optionsBoughtTransactions: [OptionsBoughtAction!]!
@@ -250,6 +251,7 @@ type ShortPosition @entity {
   netAmount: BigInt!
   buyAmount: BigInt!
   sellAmount: BigInt!
+  realizedPnl: BigInt!
 
   # Transactions with Rysk Option Exchange
   optionsBoughtTransactions: [OptionsBoughtAction!]!

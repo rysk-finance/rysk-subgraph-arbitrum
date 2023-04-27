@@ -61,6 +61,8 @@ export function handleOptionsBought(event: OptionsBought): void {
 
   optionsBoughtAction.save();
 
+  const total = event.params.premium.plus(event.params.fee);
+
   for (let i = 0; i < txLogs.length; ++i) {
     // if event is to Controller, avoid reading all events
     if (txLogs[i].address.toHexString() == CONTROLLER) {
@@ -71,12 +73,12 @@ export function handleOptionsBought(event: OptionsBought): void {
           event.transaction.from.toHexString().slice(2)
       ) {
         // if topic is shortOTokenBurned and account owner is tx sender (trader)
-        updateOptionShortPosition(true, buyer, otoken, amount, id);
+        updateOptionShortPosition(true, buyer, otoken, amount, id, total);
         return;
       }
     }
   }
-  updateOptionLongPosition(true, buyer, otoken, amount, id);
+  updateOptionLongPosition(true, buyer, otoken, amount, id, total);
 }
 
 export function handleOptionsSold(event: OptionsSold): void {
@@ -101,6 +103,8 @@ export function handleOptionsSold(event: OptionsSold): void {
 
   optionsSoldAction.save();
 
+  const total = event.params.premium.plus(event.params.fee);
+
   for (let i = 0; i < txLogs.length; ++i) {
     // if event is to Controller, avoid reading all events
     if (txLogs[i].address.toHexString() == CONTROLLER) {
@@ -111,10 +115,10 @@ export function handleOptionsSold(event: OptionsSold): void {
           event.transaction.from.toHexString().slice(2)
       ) {
         // if topic is shortOtokenMinted and account owner is tx sender (trader)
-        updateOptionShortPosition(false, seller, otoken, amount, id);
+        updateOptionShortPosition(false, seller, otoken, amount, id, total);
         return;
       }
     }
   }
-  updateOptionLongPosition(false, seller, otoken, amount, id);
+  updateOptionLongPosition(false, seller, otoken, amount, id, total);
 }
