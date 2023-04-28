@@ -128,6 +128,7 @@ export function loadOrCreateLongPosition(
     position.netAmount = BIGINT_ZERO;
     position.buyAmount = BIGINT_ZERO;
     position.sellAmount = BIGINT_ZERO;
+    position.realizedPnl = BIGINT_ZERO;
     position.active = true;
 
     position.optionsBoughtTransactions = [];
@@ -159,8 +160,9 @@ export function loadOrCreateShortPosition(
     position.netAmount = BIGINT_ZERO;
     position.buyAmount = BIGINT_ZERO;
     position.sellAmount = BIGINT_ZERO;
-
+    position.realizedPnl = BIGINT_ZERO;
     position.active = true;
+
     position.optionsBoughtTransactions = [];
     position.optionsSoldTransactions = [];
   }
