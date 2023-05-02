@@ -8,9 +8,9 @@ export let BIGDECIMAL_ZERO = BigDecimal.fromString("0");
 export let BIGDECIMAL_ONE = BigDecimal.fromString("1");
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const LIQUIDITY_POOL = "0x72038bc9f6279bd8f1d0f65535bea7f976e28fc5";
-export const OPTION_EXCHANGE = "0x63ce41ca4e30e75caf9b561e0250c25056b6e2c0";
-export const OPTION_REGISTRY = "0x6508a9d3dcedde32c7e34daab2ad7aec3292a792";
+export const LIQUIDITY_POOL = "0x0b1bf5fb77aa36cd48baa1395bc2b5fa0f135d8c";
+export const OPTION_EXCHANGE = "0xb672fe86693bf6f3b034730f5d2c77c8844d6b45";
+export const OPTION_REGISTRY = "0x4e89cc3215af050ceb63ca62470eec7c1a66f737";
 export const CONTROLLER = "0x11a602a5f5d823c103bb8b7184e22391aae5f4c2";
 
 export const SHORT_OTOKEN_BURNED =
