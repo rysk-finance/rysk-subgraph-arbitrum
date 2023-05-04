@@ -22,6 +22,7 @@ import {
   BIGINT_ZERO,
   loadOrCreateAccount,
   loadOrCreateShortPosition,
+  OPTION_EXCHANGE,
   updateRedeemerPosition,
   updateSettlerPosition
 } from "./helper";
@@ -165,7 +166,8 @@ export function handleVaultSettled(event: VaultSettled): void {
       event.params.accountOwner, // settler not .to because .to is the address that receives the payout
       event.params.oTokenAddress.toHex(), // settling short oToken
       ryskAmount, // NOTE: settling 0s user's short position
-      action.id
+      action.id,
+      vaultId
     );
   }
 }
@@ -241,6 +243,11 @@ export function handleShortOtokenMinted(event: ShortOtokenMinted): void {
   action.oToken = asset.toHex();
   action.amount = amount;
   action.save();
+
+  if (event.transaction.to!.toHex() != OPTION_EXCHANGE) {
+    // ignore if not from option exchange as it will not have a position
+    return;
+  }
 
   // add vault to trader's position
   let initPositionId = BIGINT_ZERO;

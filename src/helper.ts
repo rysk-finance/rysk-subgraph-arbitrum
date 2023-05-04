@@ -170,6 +170,26 @@ export function loadOrCreateShortPosition(
   return position as ShortPosition;
 }
 
+export function loadShortPosition(
+  user: Address,
+  oToken: string,
+  numId: BigInt
+): ShortPosition | null {
+  let id = user.toHex() + "-" + oToken + "-s-" + numId.toString();
+  let position = ShortPosition.load(id);
+  return position;
+}
+
+export function loadLongPosition(
+  user: Address,
+  oToken: string,
+  numId: BigInt
+): LongPosition | null {
+  let id = user.toHex() + "-" + oToken + "-l-" + numId.toString();
+  let position = LongPosition.load(id);
+  return position;
+}
+
 export function loadOrCreateAccount(accountId: string): Account {
   let account = Account.load(accountId);
   // if no account, create new entity
@@ -233,16 +253,30 @@ export function updateRedeemerPosition(
   tradeId: string
 ): void {
   let initPositionId = BIGINT_ZERO;
-  let position = loadOrCreateLongPosition(redeemer, oToken, initPositionId);
+  let position = loadLongPosition(redeemer, oToken, initPositionId);
+
+  if (position == null) {
+    //  is not under a position
+    return;
+  }
+
   // get the first active position for this otoken.
   while (!position.active) {
     initPositionId = initPositionId.plus(BIGINT_ONE);
-    position = loadOrCreateLongPosition(redeemer, oToken, initPositionId);
+    position = loadLongPosition(redeemer, oToken, initPositionId);
+    if (position == null) {
+      // no active position found to update
+      return;
+    }
   }
+
+  // BUG: what if user has more than "amount" oTokens as Exchange is not only access point
+  // it is an edge case but definitely possible (as position would already be expired it's fine for now)
   position.netAmount = position.netAmount.minus(amount);
   position.buyAmount = position.buyAmount.minus(amount);
   // set position to inactive (closed) whenever we get back to zero
-  if (position.netAmount.isZero()) position.active = false;
+  // or even if we go negative as user might be reedeming more than our Exchange position
+  if (position.netAmount.lt(BIGINT_ZERO)) position.active = false;
 
   let redeemActions = position.redeemActions;
   redeemActions.push(tradeId);
@@ -254,14 +288,30 @@ export function updateSettlerPosition(
   settler: Address,
   oToken: string,
   amount: BigInt,
-  settleId: string
+  settleId: string,
+  vaultId: string
 ): void {
   let initPositionId = BIGINT_ZERO;
-  let position = loadOrCreateShortPosition(settler, oToken, initPositionId);
+  let position = loadShortPosition(settler, oToken, initPositionId);
+
+  if (position == null) {
+    // vault is not under a position
+    return;
+  }
+
   // get the first active position for this otoken.
   while (!position.active) {
     initPositionId = initPositionId.plus(BIGINT_ONE);
-    position = loadOrCreateShortPosition(settler, oToken, initPositionId);
+    position = loadShortPosition(settler, oToken, initPositionId);
+    if (position == null) {
+      // vault is not under a position
+      return;
+    }
+  }
+
+  if (position.vault != vaultId.toString()) {
+    // the vault settled doesn't match with the active position
+    return;
   }
 
   position.netAmount = position.netAmount.plus(amount);
