@@ -11,6 +11,7 @@ import {
   LIQUIDITY_POOL,
   loadOrCreateAccount,
   OPTION_EXCHANGE,
+  OPTION_EXCHANGE_OLD,
   OPTION_REGISTRY,
   updateBuyerPosition,
   updateSellerPosition,
@@ -26,7 +27,13 @@ export function handleTransfer(event: Transfer): void {
   const fromAddress = event.params.from;
 
   // @todo Get these from AddressBook
-  let excludedAddresses = [LIQUIDITY_POOL, OPTION_REGISTRY, OPTION_EXCHANGE];
+  // note old option exchange needs to be excluded cause we are still using it for testing
+  let excludedAddresses = [
+    LIQUIDITY_POOL,
+    OPTION_REGISTRY,
+    OPTION_EXCHANGE,
+    OPTION_EXCHANGE_OLD
+  ];
 
   // convert to 1e18 cause LP handleWriteOptions is 1e18
   const amountLP = amount.times(BigInt.fromString("10000000000"));
