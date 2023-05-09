@@ -158,10 +158,10 @@ export function handleBuybackOption(event: BuybackOption): void {
 }
 
 export function handleDepositEpochExecuted(event: DepositEpochExecuted): void {
-  const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
+  // const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
 
   const timestamp = event.block.timestamp;
-  const totalAssets = lpContract.getAssets();
+  // const totalAssets = lpContract.getAssets();
   const epoch = event.params.epoch;
 
   // const dailyStatSnapshot = getDailySnapshot(timestamp)
@@ -173,10 +173,10 @@ export function handleDepositEpochExecuted(event: DepositEpochExecuted): void {
 export function handleWithdrawalEpochExecuted(
   event: WithdrawalEpochExecuted
 ): void {
-  const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
+  // const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
 
   const timestamp = event.block.timestamp;
-  const totalAssets = lpContract.getAssets();
+  // const totalAssets = lpContract.getAssets();
   const epoch = event.params.epoch;
 
   // const dailyStatSnapshot = getDailySnapshot(timestamp)
@@ -186,10 +186,10 @@ export function handleWithdrawalEpochExecuted(
 
   const epochString = epoch.toString();
 
-  const currentPricePerShare = lpContract.withdrawalEpochPricePerShare(epoch);
-  const initialPricePerShare = lpContract.withdrawalEpochPricePerShare(
-    BigInt.fromI32(0)
-  );
+  // const currentPricePerShare = lpContract.withdrawalEpochPricePerShare(epoch);
+  // const initialPricePerShare = lpContract.withdrawalEpochPricePerShare(
+  //   BigInt.fromI32(0)
+  // );
 
   let pricePerShare = new PricePerShare(epochString);
 
@@ -197,12 +197,14 @@ export function handleWithdrawalEpochExecuted(
   pricePerShare.timestamp = timestamp;
 
   /** Percentage Increase = [ (Final Value - Starting Value) / |Starting Value| ] × 100 */
-  pricePerShare.growthSinceFirstEpoch = currentPricePerShare
-    .minus(initialPricePerShare)
-    .toBigDecimal()
-    .div(initialPricePerShare.toBigDecimal())
-    .times(BigDecimal.fromString("100"));
-  pricePerShare.value = currentPricePerShare;
+  pricePerShare.growthSinceFirstEpoch = BigDecimal.fromString("0");
+  // currentPricePerShare
+  //   .minus(initialPricePerShare)
+  //   .toBigDecimal()
+  //   .div(initialPricePerShare.toBigDecimal())
+  //   .times(BigDecimal.fromString("100"));
+  pricePerShare.value = BigInt.fromString("0");
+  // currentPricePerShare;
 
   pricePerShare.save();
 }
@@ -220,9 +222,9 @@ export function handleRebalancePortfolioDelta(
 
   rebalanceDeltaAction.save();
 
-  const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
+  // const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
 
-  const totalAssets = lpContract.getAssets();
+  // const totalAssets = lpContract.getAssets();
 
   // const dailyStatSnapshot = getDailySnapshot(timestamp)
   // dailyStatSnapshot.totalAssets = dailyStatSnapshot.totalReturns.plus(totalAssets)

@@ -1,4 +1,4 @@
-import { BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { AddressBook as AddressBookInterface } from "../generated/AddressBook/AddressBook";
 import { OtokenCreated } from "../generated/OTokenFactory/OTokenFactory";
 import { OToken as OTokenSource } from "../generated/templates";
@@ -11,10 +11,14 @@ export function handleOtokenCreated(event: OtokenCreated): void {
   OTokenSource.create(event.params.tokenAddress);
 
   // bind to the address that emit the event
-  let factoryContract = FactoryInterface.bind(event.address);
-  let addressBookAddress = factoryContract.addressBook();
-  let addressBookContract = AddressBookInterface.bind(addressBookAddress);
-  let implementation = addressBookContract.getOtokenImpl();
+  // let factoryContract = FactoryInterface.bind(event.address);
+  let addressBookAddress = Address.fromString(
+    "0xd6e67bf0b1cdb34c37f31a2652812cb30746a94a"
+  );
+  // let addressBookContract = AddressBookInterface.bind(addressBookAddress);
+  let implementation = Address.fromString(
+    "0xb19d2ea6f662b13f530cb84b048877e5ed0bd8fe"
+  );
 
   // Create Otoken Entity
   let entity = new OToken(event.params.tokenAddress.toHex());
@@ -28,10 +32,10 @@ export function handleOtokenCreated(event: OtokenCreated): void {
   entity.creator = event.params.creator;
   entity.implementation = implementation;
 
-  let contract = TokenContract.bind(event.params.tokenAddress);
+  // let contract = TokenContract.bind(event.params.tokenAddress);
   // Access state variables and functions by calling them
-  entity.symbol = contract.symbol();
-  entity.name = contract.name();
+  entity.symbol = ""; // contract.symbol();
+  entity.name = ""; // contract.name();
   entity.decimals = 8;
 
   entity.totalSupply = BigInt.fromI32(0);
