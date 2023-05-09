@@ -1,6 +1,11 @@
 specVersion: 0.0.4
 schema:
   file: ./schema.graphql
+features:
+  - grafting
+graft:
+  base: QmbYJ4wQ9vgd3YpepJZtgef5xa7unxFiwt1QRH6zYZLMgQ
+  block: 19173350
 dataSources:
 
   - kind: ethereum

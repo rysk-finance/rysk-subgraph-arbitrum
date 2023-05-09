@@ -211,7 +211,11 @@ export function handleShortOtokenMinted(event: ShortOtokenMinted): void {
   let vaultId = accountId + "-" + id.toString();
 
   // Yassine - Opyn doesn't have !, due to breaking changes from AS 0.0.4 to 0.07
-  let vault = Vault.load(vaultId)!;
+  let vault = Vault.load(vaultId);
+
+  if (vault == null) {
+    return;
+  }
 
   const shortAmount = vault.shortAmount;
 
@@ -281,7 +285,11 @@ export function handleShortOtokenBurned(event: ShortOtokenBurned): void {
 
   // update vault struct
   let vaultId = accountId + "-" + id.toString();
-  let vault = Vault.load(vaultId)!;
+  let vault = Vault.load(vaultId);
+
+  if (vault == null) {
+    return;
+  }
 
   const shortAmount = vault.shortAmount;
 
