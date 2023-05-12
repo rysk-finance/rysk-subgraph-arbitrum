@@ -309,11 +309,6 @@ export function updateSettlerPosition(
     }
   }
 
-  if (position.vault != vaultId.toString()) {
-    // the vault settled doesn't match with the active position
-    return;
-  }
-
   position.netAmount = position.netAmount.plus(amount);
   position.sellAmount = position.sellAmount.minus(amount);
   // set position to inactive (closed) whenever we get back to zero
