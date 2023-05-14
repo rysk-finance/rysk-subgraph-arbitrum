@@ -153,6 +153,11 @@ dataSources:
         - AccountOperatorUpdated
         - CallExecuted
         - CallRestricted
+        - FullPauserUpdated
+        - OwnershipTransferred
+        - PartialPauserUpdated
+        - SystemFullyPaused
+        - SystemPartiallyPaused
       abis:
         - name: Controller
           file: ./abis/Controller.json
@@ -179,6 +184,16 @@ dataSources:
           handler: handleCallExecuted
         - event: CallRestricted(bool)
           handler: handleCallRestricted
+        - event: FullPauserUpdated(indexed address,indexed address)
+          handler: handleFullPauserUpdated
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: PartialPauserUpdated(indexed address,indexed address)
+          handler: handlePartialPauserUpdated
+        - event: SystemFullyPaused(bool)
+          handler: handleSystemFullyPaused
+        - event: SystemPartiallyPaused(bool)
+          handler: handleSystemPartiallyPaused
       file: ./src/Controller.ts
 
   - kind: ethereum/contract

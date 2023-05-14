@@ -1,23 +1,32 @@
 import { ProxyCreated } from "../generated/AddressBook/AddressBook";
 import { Controller } from "../generated/schema";
 import { Controller as ControllerContract } from "../generated/Controller/Controller";
+import { Address } from "@graphprotocol/graph-ts";
 
 export function handleProxyCreated(event: ProxyCreated): void {
-  return;
-  // createProxy is only used to  when Controller address is first created
+  // createProxy is only used when Controller address is first created
   // so we initialize Controller entity in this event.
-  // let controllerEntity = new Controller('1')
-  // let controllerContract = ControllerContract.bind(event.params.proxy)
-  //
-  // controllerEntity.addressBook = controllerContract.addressbook()
-  //
-  //
-  // controllerEntity.owner = controllerContract.owner()
-  // controllerEntity.partialPauser = controllerContract.partialPauser()
-  // controllerEntity.fullPauser = controllerContract.fullPauser()
-  // controllerEntity.systemFullyPaused = controllerContract.systemFullyPaused()
-  // controllerEntity.systemPartiallyPaused = controllerContract.systemPartiallyPaused()
-  // controllerEntity.callRestricted = controllerContract.callRestricted();
-  //
-  // controllerEntity.save()
+  let controllerEntity = new Controller("1");
+  // let controllerContract = ControllerContract.bind(event.params.proxy);
+
+  // NOTE: Hardcoded to avoid contract binding
+
+  controllerEntity.addressBook = Address.fromString(
+    "0xd6e67bf0b1cdb34c37f31a2652812cb30746a94a"
+  ); // controllerContract.addressbook();
+
+  controllerEntity.owner = Address.fromString(
+    "0xaf7f68c50de6dd885d91ced7a6572ed764d6a0b8"
+  ); // controllerContract.owner();
+  controllerEntity.partialPauser = Address.fromString(
+    "0x0000000000000000000000000000000000000000"
+  ); // controllerContract.partialPauser();
+  controllerEntity.fullPauser = Address.fromString(
+    "0x0000000000000000000000000000000000000000"
+  ); // controllerContract.fullPauser();
+  controllerEntity.systemFullyPaused = false; // controllerContract.systemFullyPaused();
+  controllerEntity.systemPartiallyPaused = false; // controllerContract.systemPartiallyPaused();
+  controllerEntity.callRestricted = true; // controllerContract.callRestricted();
+
+  controllerEntity.save();
 }
