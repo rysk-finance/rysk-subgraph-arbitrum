@@ -1,4 +1,4 @@
-import { BigInt } from "@graphprotocol/graph-ts";
+import { BigInt, store } from "@graphprotocol/graph-ts";
 import {
   CollateralAssetDeposited,
   CollateralAssetWithdrawed,
@@ -7,14 +7,17 @@ import {
   VaultSettled,
   ShortOtokenMinted,
   ShortOtokenBurned,
-  Redeem
+  Redeem,
+  AccountOperatorUpdated
 } from "../generated/Controller/Controller";
 import {
   MintShortAction,
   BurnShortAction,
   Vault,
   RedeemAction,
-  SettleAction
+  SettleAction,
+  Operator,
+  AccountOperator
 } from "../generated/schema";
 
 import {
@@ -26,6 +29,47 @@ import {
   updateRedeemerPosition,
   updateSettlerPosition
 } from "./helper";
+
+function loadOrCreateOperator(operatorId: string): Operator {
+  let operator = Operator.load(operatorId);
+  // if no operator, create new entity
+  if (operator == null) {
+    operator = new Operator(operatorId);
+    operator.accountCount = new BigInt(0);
+  }
+  return operator as Operator;
+}
+
+export function handleAccountOperatorUpdated(
+  event: AccountOperatorUpdated
+): void {
+  let accountId = event.params.accountOwner.toHex();
+  let operatorId = event.params.operator.toHex();
+  let isSet = event.params.isSet;
+
+  let account = loadOrCreateAccount(accountId);
+  let operator = loadOrCreateOperator(operatorId);
+
+  let relationId = accountId + "-" + operatorId;
+  let relation = AccountOperator.load(relationId);
+
+  if (isSet && relation == null) {
+    // adding a new  operator
+    relation = new AccountOperator(relationId);
+    relation.account = accountId;
+    relation.operator = operatorId;
+    relation.save();
+    account.operatorCount = account.operatorCount.plus(BIGINT_ONE);
+    operator.accountCount = operator.accountCount.plus(BIGINT_ONE);
+  } else if (!isSet && relation != null) {
+    store.remove("AccountOperator", relationId);
+    account.operatorCount = account.operatorCount.minus(BIGINT_ONE);
+    operator.accountCount = operator.accountCount.minus(BIGINT_ONE);
+  }
+
+  account.save();
+  operator.save();
+}
 
 /**
  * Vault Actions
