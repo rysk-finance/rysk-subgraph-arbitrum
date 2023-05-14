@@ -10,7 +10,12 @@ import {
   ShortOtokenMinted,
   ShortOtokenBurned,
   Redeem,
-  AccountOperatorUpdated
+  AccountOperatorUpdated,
+  PartialPauserUpdated,
+  FullPauserUpdated,
+  OwnershipTransferred,
+  SystemFullyPaused,
+  SystemPartiallyPaused
 } from "../generated/Controller/Controller";
 import {
   MintShortAction,
@@ -85,6 +90,55 @@ export function handleCallRestricted(event: CallRestricted): void {
 
   if (controller) {
     controller.callRestricted = event.params.isRestricted;
+    controller.save();
+  }
+}
+
+export function handleOwnershipTransferred(event: OwnershipTransferred): void {
+  let controller = Controller.load("1");
+
+  if (controller) {
+    controller.owner = event.params.newOwner;
+    controller.save();
+  }
+}
+
+export function handlePartialPauserUpdated(event: PartialPauserUpdated): void {
+  let controller = Controller.load("1");
+
+  if (controller) {
+    controller.partialPauser = event.params.newPartialPauser;
+    controller.save();
+  }
+}
+
+export function handleFullPauserUpdated(event: FullPauserUpdated): void {
+  let controller = Controller.load("1");
+
+  if (controller) {
+    controller.fullPauser = event.params.newFullPauser;
+    controller.save();
+  }
+}
+
+export function handleSystemFullyPaused(event: SystemFullyPaused): void {
+  let controller = Controller.load("1");
+
+  if (controller) {
+    // Todo: update the event parameter name {isActive}
+    controller.systemPartiallyPaused = event.params.isPaused;
+    controller.save();
+  }
+}
+
+export function handleSystemPartiallyPaused(
+  event: SystemPartiallyPaused
+): void {
+  let controller = Controller.load("1");
+
+  if (controller) {
+    // Todo: update the event parameter name {isActive}
+    controller.systemFullyPaused = event.params.isPaused;
     controller.save();
   }
 }
