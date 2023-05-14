@@ -9,6 +9,8 @@ import {
   VaultSettled,
   ShortOtokenMinted,
   ShortOtokenBurned,
+  LongOtokenDeposited,
+  LongOtokenWithdrawed,
   Redeem,
   AccountOperatorUpdated,
   PartialPauserUpdated,
@@ -25,6 +27,12 @@ import {
   SettleAction,
   Operator,
   AccountOperator,
+  OpenVaultAction,
+  DepositLongAction,
+  WithdrawLongAction,
+  DepositCollateralAction,
+  WithdrawCollateralAction,
+  Liquidation,
   Controller
 } from "../generated/schema";
 
@@ -160,12 +168,31 @@ export function handleCollateralAssetDeposited(
   let vaultId = accountId + "-" + id.toString();
   let vault = Vault.load(vaultId);
   if (vault) {
+    let collateralAmount = vault.collateralAmount;
     vault.collateralAsset = asset.toHex();
-    vault.collateralAmount = vault.collateralAmount
-      ? vault.collateralAmount!.plus(amount)
+    vault.collateralAmount = collateralAmount
+      ? collateralAmount.plus(amount)
       : BIGINT_ZERO.plus(amount);
     vault.save();
   }
+
+  // create action entity
+  let actionId =
+    "DEPOSIT-COLLATERAL-" +
+    event.transaction.hash.toHex() +
+    "-" +
+    event.logIndex.toString();
+  let action = new DepositCollateralAction(actionId);
+  action.messageSender = event.transaction.from;
+  action.vault = vaultId;
+  action.block = event.block.number;
+  action.transactionHash = event.transaction.hash;
+  action.timestamp = event.block.timestamp;
+  // DepositCollaralAction fields
+  action.from = from;
+  action.asset = asset.toHex();
+  action.amount = amount;
+  action.save();
 }
 
 export function handleCollateralAssetWithdrawed(
@@ -189,6 +216,24 @@ export function handleCollateralAssetWithdrawed(
 
     vault.save();
   }
+
+  // create action entity
+  let actionId =
+    "WITHDRAW-COLLATERAL-" +
+    event.transaction.hash.toHex() +
+    "-" +
+    event.logIndex.toString();
+  let action = new WithdrawCollateralAction(actionId);
+  action.messageSender = event.transaction.from;
+  action.vault = vaultId;
+  action.block = event.block.number;
+  action.transactionHash = event.transaction.hash;
+  action.timestamp = event.block.timestamp;
+  // DepositCollaralAction fields
+  action.to = to;
+  action.asset = asset.toHex();
+  action.amount = amount;
+  action.save();
 }
 
 export function handleLiquidation(event: VaultLiquidated): void {
@@ -211,6 +256,101 @@ export function handleLiquidation(event: VaultLiquidated): void {
 
     vault.save();
   }
+
+  // create action entity
+  let actionId =
+    "LIQUIDATION" +
+    event.transaction.hash.toHex() +
+    "-" +
+    event.logIndex.toString();
+  let action = new Liquidation(actionId);
+  action.messageSender = event.transaction.from;
+  action.vault = vaultId;
+  action.block = event.block.number;
+  action.transactionHash = event.transaction.hash;
+  action.timestamp = event.block.timestamp;
+  // Liquidation fields
+  // action.auctionPrice = event.params.auctionPrice;
+  // action.auctionStartingRound = event.params.auctionStartingRound;
+  action.collateralPayout = collateralPayout;
+  action.debtAmount = debtAmount;
+  action.liquidator = event.params.liquidator;
+  action.save();
+}
+
+export function handleLongOtokenDeposited(event: LongOtokenDeposited): void {
+  let accountId = event.params.accountOwner.toHex();
+  let id = event.params.vaultId;
+  let asset = event.params.otoken;
+  let from = event.params.from;
+  let amount = event.params.amount;
+
+  // update vault struct
+  let vaultId = accountId + "-" + id.toString();
+  let vault = Vault.load(vaultId);
+
+  if (vault) {
+    let longAmount = vault.longAmount ? vault.longAmount! : BIGINT_ZERO;
+    vault.longOToken = asset.toHex();
+    vault.longAmount = longAmount.plus(amount);
+    vault.save();
+  }
+
+  // create action entity
+  let actionId =
+    "DEPOSIT-LONG-" +
+    event.transaction.hash.toHex() +
+    "-" +
+    event.logIndex.toString();
+  let action = new DepositLongAction(actionId);
+  action.messageSender = event.transaction.from;
+  action.vault = vaultId;
+  action.block = event.block.number;
+  action.transactionHash = event.transaction.hash;
+  action.timestamp = event.block.timestamp;
+  // DepositLong fields
+  action.from = from;
+  action.oToken = asset.toHex();
+  action.amount = amount;
+  action.save();
+}
+
+export function handleLongOtokenWithdrawed(event: LongOtokenWithdrawed): void {
+  let accountId = event.params.AccountOwner.toHex();
+  let id = event.params.vaultId;
+  let asset = event.params.otoken;
+  let to = event.params.to;
+  let amount = event.params.amount;
+
+  // update vault struct
+  let vaultId = accountId + "-" + id.toString();
+  let vault = Vault.load(vaultId);
+
+  if (vault) {
+    let longAmount = vault.longAmount ? vault.longAmount! : BIGINT_ZERO;
+    // if amount = 0, set the longOtoken back to null
+    vault.longOToken = longAmount.minus(amount).isZero() ? null : asset.toHex();
+    vault.longAmount = longAmount.minus(amount);
+    vault.save();
+  }
+
+  // create action entity
+  let actionId =
+    "WITHDRAW-LONG-" +
+    event.transaction.hash.toHex() +
+    "-" +
+    event.logIndex.toString();
+  let action = new WithdrawLongAction(actionId);
+  action.messageSender = event.transaction.from;
+  action.vault = vaultId;
+  action.block = event.block.number;
+  action.transactionHash = event.transaction.hash;
+  action.timestamp = event.block.timestamp;
+  // WithdrawLong fields
+  action.to = to;
+  action.oToken = asset.toHex();
+  action.amount = amount;
+  action.save();
 }
 
 export function handleVaultOpened(event: VaultOpened): void {
@@ -230,6 +370,20 @@ export function handleVaultOpened(event: VaultOpened): void {
   vault.firstMintTimestamp = BIGINT_ZERO;
 
   vault.save();
+
+  // create action entity
+  let actionId =
+    "VAULT-OPENED-" +
+    event.transaction.hash.toHex() +
+    "-" +
+    event.logIndex.toString();
+  let action = new OpenVaultAction(actionId);
+  action.messageSender = event.transaction.from;
+  action.vault = vaultId;
+  action.block = event.block.number;
+  action.transactionHash = event.transaction.hash;
+  action.timestamp = event.block.timestamp;
+  action.save();
 }
 
 export function handleVaultSettled(event: VaultSettled): void {
