@@ -151,6 +151,8 @@ dataSources:
         - VaultOpened
         - VaultSettled
         - AccountOperatorUpdated
+        - CallExecuted
+        - CallRestricted
       abis:
         - name: Controller
           file: ./abis/Controller.json
@@ -173,6 +175,10 @@ dataSources:
           handler: handleLiquidation
         - event: AccountOperatorUpdated(indexed address,indexed address,bool)
           handler: handleAccountOperatorUpdated
+        - event: CallExecuted(indexed address,indexed address,bytes)
+          handler: handleCallExecuted
+        - event: CallRestricted(bool)
+          handler: handleCallRestricted
       file: ./src/Controller.ts
 
   - kind: ethereum/contract

@@ -2,6 +2,8 @@ import { BigInt, store } from "@graphprotocol/graph-ts";
 import {
   CollateralAssetDeposited,
   CollateralAssetWithdrawed,
+  CallExecuted,
+  CallRestricted,
   VaultLiquidated,
   VaultOpened,
   VaultSettled,
@@ -17,7 +19,8 @@ import {
   RedeemAction,
   SettleAction,
   Operator,
-  AccountOperator
+  AccountOperator,
+  Controller
 } from "../generated/schema";
 
 import {
@@ -69,6 +72,21 @@ export function handleAccountOperatorUpdated(
 
   account.save();
   operator.save();
+}
+
+export function handleCallExecuted(event: CallExecuted): void {}
+
+/**
+ * System Settings
+ */
+
+export function handleCallRestricted(event: CallRestricted): void {
+  let controller = Controller.load("1");
+
+  if (controller) {
+    controller.callRestricted = event.params.isRestricted;
+    controller.save();
+  }
 }
 
 /**
