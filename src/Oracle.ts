@@ -16,7 +16,7 @@ import {
   OraclePricer
 } from "../generated/schema";
 
-// import { checkERC20Entity } from './Whitelist'
+import { checkERC20Entity } from "./Whitelist";
 
 import { ZERO_ADDRESS, BIGINT_ZERO } from "./helper";
 
@@ -89,8 +89,8 @@ export function handlePricerLockingPeriodUpdated(
 }
 
 export function handlePricerUpdated(event: PricerUpdated): void {
-  // let success = checkERC20Entity(event.params.asset)
-  // if (!success) return
+  let success = checkERC20Entity(event.params.asset);
+  if (!success) return;
 
   let assetEntity = loadOrCreateAssetEntity(event.params.asset.toHex());
   let pricerId = event.params.pricer.toHex();
