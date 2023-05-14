@@ -148,6 +148,8 @@ dataSources:
         - Redeem
         - ShortOtokenBurned
         - ShortOtokenMinted
+        - LongOtokenDeposited
+        - LongOtokenWithdrawed
         - VaultOpened
         - VaultSettled
         - AccountOperatorUpdated
@@ -172,6 +174,10 @@ dataSources:
           handler: handleShortOtokenBurned
         - event: ShortOtokenMinted(indexed address,indexed address,indexed address,uint256,uint256)
           handler: handleShortOtokenMinted
+        - event: LongOtokenDeposited(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleLongOtokenDeposited
+        - event: LongOtokenWithdrawed(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleLongOtokenWithdrawed
         - event: VaultOpened(indexed address,uint256,indexed uint256)
           handler: handleVaultOpened
         - event: VaultSettled(indexed address,indexed address,address,uint256,uint256,indexed uint256)
