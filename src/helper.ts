@@ -196,6 +196,7 @@ export function loadOrCreateAccount(accountId: string): Account {
   if (account == null) {
     account = new Account(accountId);
     account.vaultCount = new BigInt(0);
+    account.operatorCount = new BigInt(0);
   }
   return account as Account;
 }
