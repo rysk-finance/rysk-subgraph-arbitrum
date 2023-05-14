@@ -196,7 +196,8 @@ export function handleRedeem(event: Redeem): void {
     event.params.receiver,
     action.oToken,
     action.otokenBurned.times(BigInt.fromString("10000000000")), // positions are stored as Rysk: e18
-    action.id
+    action.id,
+    action.payoutAmount
   );
 }
 

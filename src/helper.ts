@@ -250,7 +250,8 @@ export function updateRedeemerPosition(
   redeemer: Address,
   oToken: string,
   amount: BigInt,
-  tradeId: string
+  tradeId: string,
+  payout: BigInt // expected to be in the same format as realizedPnl
 ): void {
   let initPositionId = BIGINT_ZERO;
   let position = loadLongPosition(redeemer, oToken, initPositionId);
@@ -274,6 +275,10 @@ export function updateRedeemerPosition(
   // it is an edge case but definitely possible (as position would already be expired it's fine for now)
   position.netAmount = position.netAmount.minus(amount);
   position.buyAmount = position.buyAmount.minus(amount);
+
+  // add realizedPnl to position (redeem only affects LONGS so no nede to check if isBuy)
+  position.realizedPnl = position.realizedPnl.plus(payout);
+
   // set position to inactive (closed) whenever we get back to zero
   // or even if we go negative as user might be reedeming more than our Exchange position
   if (position.netAmount.lt(BIGINT_ZERO)) position.active = false;
