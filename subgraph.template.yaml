@@ -150,6 +150,7 @@ dataSources:
         - ShortOtokenMinted
         - VaultOpened
         - VaultSettled
+        - AccountOperatorUpdated
       abis:
         - name: Controller
           file: ./abis/Controller.json
@@ -170,6 +171,8 @@ dataSources:
           handler: handleVaultSettled
         - event: VaultLiquidated(indexed address,address,indexed address,uint256,uint256,uint256,uint256,indexed address)
           handler: handleLiquidation
+        - event: AccountOperatorUpdated(indexed address,indexed address,bool)
+          handler: handleAccountOperatorUpdated
       file: ./src/Controller.ts
 
   - kind: ethereum/contract
