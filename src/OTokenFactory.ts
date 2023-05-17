@@ -2,9 +2,7 @@ import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { OtokenCreated } from "../generated/OTokenFactory/OTokenFactory";
 import { OToken as OTokenSource } from "../generated/templates";
 import { OToken } from "../generated/schema";
-
-const WETH_ADDRESS = "0x3b3a1de07439eeb04492fa64a889ee25a130cdd3";
-// const USDC_ADDRESS = "0x408c5755b5c7a0a28d851558ea3636cfc5b5b19d";
+import { WETH_ADDRESS } from "./helper";
 
 export function handleOtokenCreated(event: OtokenCreated): void {
   // Start indexing the newly created OToken contract

@@ -13,6 +13,7 @@ import {
 import { ERC20 as ERC20Contract } from "../generated/OTokenFactory/ERC20";
 import { ERC20, WhitelistedProduct } from "../generated/schema";
 import { log } from "@graphprotocol/graph-ts";
+import { USDC_ADDRESS, WETH_ADDRESS } from "./helper";
 
 // const blacklistedPaymentTokens = ['0xb7a4f3e9097c08da09517b5ab877f7a917224ede']
 
@@ -117,29 +118,49 @@ function getProductId(
  */
 export function checkERC20Entity(address: Address): boolean {
   let entity = ERC20.load(address.toHex());
-  if (entity != null) return true;
+
+  if (entity != null) {
+    if (entity.symbol == "") {
+      if (address.toHex() == WETH_ADDRESS) {
+        entity.symbol = "WETH";
+        entity.name = "Wrapped Ether";
+        entity.decimals = 18;
+      } else if (address.toHex() == USDC_ADDRESS) {
+        entity.symbol = "USDC";
+        entity.name = "USDC";
+        entity.decimals = 6;
+      }
+      entity.save();
+    }
+  } else {
+    entity = new ERC20(address.toHex());
+    entity.symbol = "";
+    entity.name = "";
+    entity.decimals = 0;
+    entity.save();
+  }
 
   log.info("checkERC20Entity createERC20 Entity {} start", [
     address.toString()
   ]);
 
-  entity = new ERC20(address.toHex());
+  // entity = new ERC20(address.toHex());
 
   // NOTE avoiding contract calls
   // let contract = ERC20Contract.bind(address);
 
   // let symbolResult = contract.try_symbol();
   // if (symbolResult.reverted) return false;
-  entity.symbol = ""; // symbolResult.value as string;
+  // entity.symbol = symbolResult.value as string;
 
   // let nameResult = contract.try_name();
   // if (nameResult.reverted) return false;
-  entity.name = ""; // nameResult.value as string;
+  // entity.name = nameResult.value as string;
 
   // let decimalsResult = contract.try_decimals();
   // if (decimalsResult.reverted) return false;
-  entity.decimals = 0; // decimalsResult.value as i32;
-  entity.save();
+  // entity.decimals = decimalsResult.value as i32;
+  // entity.save();
 
   log.info("checkERC20Entity createERC20 Entity {} done", [address.toString()]);
   return true;
