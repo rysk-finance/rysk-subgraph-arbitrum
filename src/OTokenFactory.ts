@@ -1,10 +1,10 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { AddressBook as AddressBookInterface } from "../generated/AddressBook/AddressBook";
 import { OtokenCreated } from "../generated/OTokenFactory/OTokenFactory";
 import { OToken as OTokenSource } from "../generated/templates";
-import { OToken as TokenContract } from "../generated/templates/OToken/OToken";
-import { OTokenFactory as FactoryInterface } from "../generated/OTokenFactory/OTokenFactory";
 import { OToken } from "../generated/schema";
+
+const WETH_ADDRESS = "0x3b3a1de07439eeb04492fa64a889ee25a130cdd3";
+// const USDC_ADDRESS = "0x408c5755b5c7a0a28d851558ea3636cfc5b5b19d";
 
 export function handleOtokenCreated(event: OtokenCreated): void {
   // Start indexing the newly created OToken contract
@@ -12,9 +12,9 @@ export function handleOtokenCreated(event: OtokenCreated): void {
 
   // bind to the address that emit the event
   // let factoryContract = FactoryInterface.bind(event.address);
-  let addressBookAddress = Address.fromString(
-    "0xd6e67bf0b1cdb34c37f31a2652812cb30746a94a"
-  );
+  // let addressBookAddress = Address.fromString(
+  //   "0xd6e67bf0b1cdb34c37f31a2652812cb30746a94a"
+  // );
   // let addressBookContract = AddressBookInterface.bind(addressBookAddress);
   let implementation = Address.fromString(
     "0xb19d2ea6f662b13f530cb84b048877e5ed0bd8fe"
@@ -33,9 +33,30 @@ export function handleOtokenCreated(event: OtokenCreated): void {
   entity.implementation = implementation;
 
   // let contract = TokenContract.bind(event.params.tokenAddress);
-  // Access state variables and functions by calling them
-  entity.symbol = ""; // contract.symbol();
+
+  // NOTE: This handles well only current cases of WETH as underlying and USDC or WETH as collateral
+  if (entity.underlyingAsset.toString() == WETH_ADDRESS) {
+    const date = new Date(
+      event.params.expiry.times(BigInt.fromString("1000")).toU64()
+    )
+      .toDateString()
+      .split(" "); // ex. ["Fri", "Jun", "30", "2023"]
+
+    const expiry = date[2] + date[1].toUpperCase() + date[3].substr(2);
+
+    entity.symbol = "oWETHUSDC/"
+      .concat(entity.collateralAsset == WETH_ADDRESS ? "WETH" : "USDC")
+      .concat("-")
+      .concat(expiry)
+      .concat("-")
+      .concat(entity.strikePrice.toString().substr(0, 4))
+      .concat(entity.isPut ? "P" : "C");
+  } else {
+    entity.symbol = ""; // contract.symbol();
+  }
+
   entity.name = ""; // contract.name();
+
   entity.decimals = 8;
 
   entity.totalSupply = BigInt.fromI32(0);
