@@ -40,6 +40,9 @@ export function handleTransfer(event: Transfer): void {
 
   if (fromAddress.toHex() == ZERO_ADDRESS) {
     // Mint Operation
+    if (entity != null) {
+      entity.totalSupply = entity.totalSupply.plus(amount);
+    }
 
     // update account balance
     let accountBalance = getOrCreateAccountBalance(toAddress, entity as OToken);
@@ -47,6 +50,10 @@ export function handleTransfer(event: Transfer): void {
     accountBalance.save();
   } else if (toAddress.toHex() == ZERO_ADDRESS) {
     // Burn event
+    if (entity != null) {
+      entity.totalSupply = entity.totalSupply.minus(event.params.value);
+    }
+
     let accountBalance = getOrCreateAccountBalance(
       fromAddress,
       entity as OToken
@@ -102,6 +109,9 @@ export function handleTransfer(event: Transfer): void {
         optionsTransferTransaction.id
       );
     }
+  }
+  if (entity != null) {
+    entity.save();
   }
 }
 
