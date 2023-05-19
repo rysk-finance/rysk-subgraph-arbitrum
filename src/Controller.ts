@@ -42,6 +42,7 @@ import {
   loadOrCreateAccount,
   loadOrCreateShortPosition,
   OPTION_EXCHANGE,
+  updateLiquidatedPosition,
   updateRedeemerPosition,
   updateSettlerPosition
 } from "./helper";
@@ -259,7 +260,7 @@ export function handleLiquidation(event: VaultLiquidated): void {
 
   // create action entity
   let actionId =
-    "LIQUIDATION" +
+    "LIQUIDATION-" +
     event.transaction.hash.toHex() +
     "-" +
     event.logIndex.toString();
@@ -276,6 +277,15 @@ export function handleLiquidation(event: VaultLiquidated): void {
   action.debtAmount = debtAmount;
   action.liquidator = event.params.liquidator;
   action.save();
+
+  if (vault) {
+    updateLiquidatedPosition(
+      event.params.vaultOwner,
+      vault.shortOToken!,
+      action.debtAmount.times(BigInt.fromString("10000000000")), // positions are stored as Rysk: e18
+      action.id
+    );
+  }
 }
 
 export function handleLongOtokenDeposited(event: LongOtokenDeposited): void {

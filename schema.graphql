@@ -284,6 +284,9 @@ type ShortPosition @entity {
   "vault settle actions (payout)"
   settleActions: [SettleAction!]!
 
+  "vault liquidate actions"
+  liquidateActions: [Liquidation!]
+
   "Wheather this is an active or closed position."
   active: Boolean!
 
