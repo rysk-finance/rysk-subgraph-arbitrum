@@ -328,3 +328,43 @@ export function updateSettlerPosition(
   position.settleActions = settleActions;
   position.save();
 }
+
+export function updateLiquidatedPosition(
+  address: Address, // account being liquidated
+  oToken: string, // vault short oToken being liquidated
+  amount: BigInt, // oToken amount being liquidated
+  liquidationId: string // vault action of liquidation
+): void {
+  let initPositionId = BIGINT_ZERO;
+  let position = loadShortPosition(address, oToken, initPositionId);
+
+  if (position == null) {
+    // vault is not under a position
+    return;
+  }
+
+  // get the first active position for this otoken.
+  while (!position.active) {
+    initPositionId = initPositionId.plus(BIGINT_ONE);
+    position = loadShortPosition(address, oToken, initPositionId);
+    if (position == null) {
+      // vault is not under a position
+      return;
+    }
+  }
+
+  position.netAmount = position.netAmount.plus(amount);
+  position.sellAmount = position.sellAmount.minus(amount);
+  // set position to inactive (closed) whenever we get back to zero
+  if (position.netAmount.isZero()) position.active = false;
+
+  let liquidateActions = position.liquidateActions;
+
+  if (liquidateActions == null) {
+    liquidateActions = [];
+  }
+
+  liquidateActions.push(liquidationId);
+  position.liquidateActions = liquidateActions;
+  position.save();
+}
