@@ -33,7 +33,9 @@ import {
   DepositCollateralAction,
   WithdrawCollateralAction,
   Liquidation,
-  Controller
+  Controller,
+  ExpiryPrice,
+  OToken
 } from "../generated/schema";
 
 import {
@@ -44,7 +46,9 @@ import {
   OPTION_EXCHANGE,
   updateLiquidatedPosition,
   updateRedeemerPosition,
-  updateSettlerPosition
+  updateSettlerPosition,
+  USDC_ADDRESS,
+  WETH_ADDRESS
 } from "./helper";
 
 function loadOrCreateOperator(operatorId: string): Operator {
@@ -442,12 +446,45 @@ export function handleVaultSettled(event: VaultSettled): void {
       "shortAmount can't be null"
     ).times(BigInt.fromString("10000000000"));
 
+    let amountForRedeem = BigInt.fromString("0");
+
+    const collateralInVault = assert(
+      action.collateralAmount,
+      "collateral can't be null"
+    );
+    const payoutFromVault = assert(action.amount, "Payout can't be null");
+
+    // USDC or WETH cost of settle
+    const loss = collateralInVault.minus(payoutFromVault);
+    if (loss.gt(BIGINT_ZERO)) {
+      if (action.collateral == USDC_ADDRESS) {
+        // if there is a loss remove it from p/l (cost to the trader)
+        amountForRedeem = amountForRedeem.plus(loss);
+      } else if (action.collateral == WETH_ADDRESS) {
+        // get price of weth in usdc
+        const otoken = OToken.load(event.params.oTokenAddress.toHex());
+        if (otoken) {
+          const expiryPrice = ExpiryPrice.load(
+            WETH_ADDRESS + "-" + otoken.expiryTimestamp.toString()
+          );
+          if (expiryPrice) {
+            const wethPrice = expiryPrice.price; // 8 decimals
+            const usdcLoss = loss
+              .times(wethPrice)
+              .div(BigInt.fromString("100000000000000000000"));
+            amountForRedeem = amountForRedeem.plus(usdcLoss);
+          }
+        }
+      }
+    }
+
     updateSettlerPosition(
       event.params.accountOwner, // settler not .to because .to is the address that receives the payout
       event.params.oTokenAddress.toHex(), // settling short oToken
       ryskAmount, // NOTE: settling 0s user's short position
       action.id,
-      vaultId
+      vaultId,
+      amountForRedeem
     );
   }
 }
