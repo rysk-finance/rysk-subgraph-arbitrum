@@ -298,7 +298,8 @@ export function updateSettlerPosition(
   oToken: string,
   amount: BigInt,
   settleId: string,
-  vaultId: string
+  vaultId: string,
+  loss: BigInt
 ): void {
   let initPositionId = BIGINT_ZERO;
   let position = loadShortPosition(settler, oToken, initPositionId);
@@ -320,6 +321,10 @@ export function updateSettlerPosition(
 
   position.netAmount = position.netAmount.plus(amount);
   position.sellAmount = position.sellAmount.minus(amount);
+
+  // subtract loss (amount that stays in vault for redeem)
+  position.realizedPnl = position.realizedPnl.minus(loss);
+
   // set position to inactive (closed) whenever we get back to zero
   if (position.netAmount.isZero()) position.active = false;
 
