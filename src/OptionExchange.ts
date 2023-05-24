@@ -103,7 +103,7 @@ export function handleOptionsSold(event: OptionsSold): void {
 
   optionsSoldAction.save();
 
-  const total = event.params.premium.plus(event.params.fee);
+  const total = event.params.premium.minus(event.params.fee);
 
   for (let i = 0; i < txLogs.length; ++i) {
     // if event is to Controller, avoid reading all events
