@@ -290,7 +290,7 @@ export function updateRedeemerPosition(
 
   // set position to inactive (closed) whenever we get back to zero
   // or even if we go negative as user might be reedeming more than our Exchange position
-  if (position.netAmount.lt(BIGINT_ZERO)) position.active = false;
+  if (position.netAmount.le(BIGINT_ZERO)) position.active = false;
 
   let redeemActions = position.redeemActions;
   redeemActions.push(tradeId);
