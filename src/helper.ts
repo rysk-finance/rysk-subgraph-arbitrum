@@ -1,6 +1,11 @@
 import { BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
 
-import { Account, LongPosition, ShortPosition } from "../generated/schema";
+import {
+  Account,
+  LongPosition,
+  ShortPosition,
+  Stat
+} from "../generated/schema";
 
 export let BIGINT_ONE = BigInt.fromI32(1);
 export let BIGINT_ZERO = BigInt.fromI32(0);
@@ -372,4 +377,29 @@ export function updateLiquidatedPosition(
   liquidateActions.push(liquidationId);
   position.liquidateActions = liquidateActions;
   position.save();
+}
+
+// dashboard functions
+
+export function addFeesToStats(fees: BigInt, isBuy: boolean): void {
+  let stats = loadOrCreateStats();
+
+  if (isBuy) {
+    stats.totalFeesBought = stats.totalFeesBought.plus(fees);
+  } else {
+    stats.totalFeesSold = stats.totalFeesSold.plus(fees);
+  }
+  stats.save();
+}
+
+export function loadOrCreateStats(): Stat {
+  let stats = Stat.load("0");
+
+  if (!stats) {
+    stats = new Stat("0");
+    stats.totalFeesSold = BIGINT_ZERO;
+    stats.totalFeesBought = BIGINT_ZERO;
+  }
+
+  return stats;
 }
