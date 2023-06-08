@@ -11,6 +11,7 @@ import {
 } from "../generated/schema";
 
 import {
+  addFeesToStats,
   CONTROLLER,
   SHORT_OTOKEN_BURNED,
   SHORT_OTOKEN_MINTED,
@@ -79,6 +80,9 @@ export function handleOptionsBought(event: OptionsBought): void {
     }
   }
   updateOptionLongPosition(true, buyer, otoken, amount, id, total);
+
+  // add fees to stats
+  addFeesToStats(event.params.fee, true);
 }
 
 export function handleOptionsSold(event: OptionsSold): void {
@@ -121,4 +125,7 @@ export function handleOptionsSold(event: OptionsSold): void {
     }
   }
   updateOptionLongPosition(false, seller, otoken, amount, id, total);
+
+  // add fees to stats
+  addFeesToStats(event.params.fee, false);
 }
