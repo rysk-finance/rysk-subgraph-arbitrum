@@ -381,13 +381,19 @@ export function updateLiquidatedPosition(
 
 // dashboard functions
 
-export function addFeesToStats(fees: BigInt, isBuy: boolean): void {
+export function updateStats(
+  amount: BigInt,
+  fees: BigInt,
+  isBuy: boolean
+): void {
   let stats = loadOrCreateStats();
 
   if (isBuy) {
     stats.totalFeesBought = stats.totalFeesBought.plus(fees);
+    stats.volumeOptionsBought = stats.volumeOptionsBought.plus(amount);
   } else {
     stats.totalFeesSold = stats.totalFeesSold.plus(fees);
+    stats.volumeOptionsSold = stats.volumeOptionsSold.plus(amount);
   }
   stats.save();
 }
@@ -399,6 +405,8 @@ export function loadOrCreateStats(): Stat {
     stats = new Stat("0");
     stats.totalFeesSold = BIGINT_ZERO;
     stats.totalFeesBought = BIGINT_ZERO;
+    stats.volumeOptionsBought = BIGINT_ZERO;
+    stats.volumeOptionsSold = BIGINT_ZERO;
   }
 
   return stats;
