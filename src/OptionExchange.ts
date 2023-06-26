@@ -64,6 +64,9 @@ export function handleOptionsBought(event: OptionsBought): void {
 
   const total = event.params.premium.plus(event.params.fee);
 
+  // add fees to stats
+  addFeesToStats(event.params.fee, true);
+
   for (let i = 0; i < txLogs.length; ++i) {
     // if event is to Controller, avoid reading all events
     if (txLogs[i].address.toHexString() == CONTROLLER) {
@@ -80,9 +83,6 @@ export function handleOptionsBought(event: OptionsBought): void {
     }
   }
   updateOptionLongPosition(true, buyer, otoken, amount, id, total);
-
-  // add fees to stats
-  addFeesToStats(event.params.fee, true);
 }
 
 export function handleOptionsSold(event: OptionsSold): void {
@@ -109,6 +109,9 @@ export function handleOptionsSold(event: OptionsSold): void {
 
   const total = event.params.premium.minus(event.params.fee);
 
+  // add fees to stats
+  addFeesToStats(event.params.fee, false);
+
   for (let i = 0; i < txLogs.length; ++i) {
     // if event is to Controller, avoid reading all events
     if (txLogs[i].address.toHexString() == CONTROLLER) {
@@ -125,7 +128,4 @@ export function handleOptionsSold(event: OptionsSold): void {
     }
   }
   updateOptionLongPosition(false, seller, otoken, amount, id, total);
-
-  // add fees to stats
-  addFeesToStats(event.params.fee, false);
 }
