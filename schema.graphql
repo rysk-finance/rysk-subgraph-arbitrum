@@ -575,4 +575,6 @@ type Stat @entity {
   id: ID!
   totalFeesSold: BigInt!
   totalFeesBought: BigInt!
+  volumeOptionsBought: BigInt!
+  volumeOptionsSold: BigInt!
 }

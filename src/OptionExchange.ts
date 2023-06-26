@@ -11,7 +11,7 @@ import {
 } from "../generated/schema";
 
 import {
-  addFeesToStats,
+  updateStats,
   CONTROLLER,
   SHORT_OTOKEN_BURNED,
   SHORT_OTOKEN_MINTED,
@@ -65,7 +65,7 @@ export function handleOptionsBought(event: OptionsBought): void {
   const total = event.params.premium.plus(event.params.fee);
 
   // add fees to stats
-  addFeesToStats(event.params.fee, true);
+  updateStats(event.params.optionAmount, event.params.fee, true);
 
   for (let i = 0; i < txLogs.length; ++i) {
     // if event is to Controller, avoid reading all events
@@ -110,7 +110,7 @@ export function handleOptionsSold(event: OptionsSold): void {
   const total = event.params.premium.minus(event.params.fee);
 
   // add fees to stats
-  addFeesToStats(event.params.fee, false);
+  updateStats(event.params.optionAmount, event.params.fee, false);
 
   for (let i = 0; i < txLogs.length; ++i) {
     // if event is to Controller, avoid reading all events
