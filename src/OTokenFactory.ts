@@ -15,7 +15,7 @@ export function handleOtokenCreated(event: OtokenCreated): void {
   // );
   // let addressBookContract = AddressBookInterface.bind(addressBookAddress);
   let implementation = Address.fromString(
-    "0xb19d2ea6f662b13f530cb84b048877e5ed0bd8fe"
+    "0x1d96e828e0aa743783919b24ccdb971504a96c77" // Testnet: 0xb19d2ea6f662b13f530cb84b048877e5ed0bd8fe
   );
 
   // Create Otoken Entity

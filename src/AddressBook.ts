@@ -12,11 +12,11 @@ export function handleProxyCreated(event: ProxyCreated): void {
   // NOTE: Hardcoded to avoid contract binding
 
   controllerEntity.addressBook = Address.fromString(
-    "0xd6e67bf0b1cdb34c37f31a2652812cb30746a94a"
+    "0xca19f26c52b11186b4b1e76a662a14da5149ea5a" // Testnet: 0xd6e67bf0b1cdb34c37f31a2652812cb30746a94a
   ); // controllerContract.addressbook();
 
   controllerEntity.owner = Address.fromString(
-    "0xaf7f68c50de6dd885d91ced7a6572ed764d6a0b8"
+    "0xfbde2e477ed031f54ed5ad52f35ee43cd82cf2a6" // Testnet: 0xaf7f68c50de6dd885d91ced7a6572ed764d6a0b8
   ); // controllerContract.owner();
   controllerEntity.partialPauser = Address.fromString(
     "0x0000000000000000000000000000000000000000"

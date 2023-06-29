@@ -9,6 +9,7 @@ import { Address, BigInt } from "@graphprotocol/graph-ts";
 import {
   BIGINT_ZERO,
   LIQUIDITY_POOL,
+  LIQUIDITY_POOL_OLD,
   loadOrCreateAccount,
   OPTION_EXCHANGE,
   OPTION_EXCHANGE_OLD,
@@ -30,6 +31,7 @@ export function handleTransfer(event: Transfer): void {
   // note old option exchange needs to be excluded cause we are still using it for testing
   let excludedAddresses = [
     LIQUIDITY_POOL,
+    LIQUIDITY_POOL_OLD,
     OPTION_REGISTRY,
     OPTION_EXCHANGE,
     OPTION_EXCHANGE_OLD
