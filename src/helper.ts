@@ -283,7 +283,8 @@ export function updateRedeemerPosition(
   // BUG: what if user has more than "amount" oTokens as Exchange is not only access point
   // it is an edge case but definitely possible (as position would already be expired it's fine for now)
   position.netAmount = position.netAmount.minus(amount);
-  position.buyAmount = position.buyAmount.minus(amount);
+  // remove this because buyAmount should not update on redeem
+  // position.buyAmount = position.buyAmount.minus(amount);
 
   // add realizedPnl to position (redeem only affects LONGS so no nede to check if isBuy)
   position.realizedPnl = position.realizedPnl.plus(payout);
@@ -325,7 +326,8 @@ export function updateSettlerPosition(
   }
 
   position.netAmount = position.netAmount.plus(amount);
-  position.sellAmount = position.sellAmount.minus(amount);
+  // remove this because sellAmount shouldnt change on settle
+  // position.sellAmount = position.sellAmount.minus(amount);
 
   // subtract loss (amount that stays in vault for redeem)
   position.realizedPnl = position.realizedPnl.minus(loss);
@@ -364,7 +366,8 @@ export function updateLiquidatedPosition(
   }
 
   position.netAmount = position.netAmount.plus(amount);
-  position.sellAmount = position.sellAmount.minus(amount);
+  // remove this so we can keep track of historical before liquidation
+  // position.sellAmount = position.sellAmount.minus(amount);
   // set position to inactive (closed) whenever we get back to zero
   if (position.netAmount.isZero()) position.active = false;
 
