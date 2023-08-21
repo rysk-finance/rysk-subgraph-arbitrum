@@ -9,8 +9,11 @@ npm i
 ## Building the graph
 
 ```shell
-# prepare arbitrum
+# prepare arbitrum mainnet 
 npm run prepare:arbitrum
+
+# or prepare arbitrum goerli 
+npm run prepare:arbitrum-goerli
 
 # compile types
 npm run codegen

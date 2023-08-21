@@ -41,7 +41,7 @@ export function handleCollateralApprovalChanged(
 }
 
 export function handleOptionsBought(event: OptionsBought): void {
-  const id = event.transaction.hash.toHex();
+  const txHash = event.transaction.hash.toHex();
 
   const receipt = event.receipt;
   const txLogs = receipt ? receipt.logs : [];
@@ -49,6 +49,8 @@ export function handleOptionsBought(event: OptionsBought): void {
   const buyer = event.params.buyer;
   const otoken = event.params.series.toHex();
   const amount = event.params.optionAmount;
+
+  const id = txHash + "-" + otoken;
 
   const optionsBoughtAction = new OptionsBoughtAction(id);
 
@@ -86,7 +88,7 @@ export function handleOptionsBought(event: OptionsBought): void {
 }
 
 export function handleOptionsSold(event: OptionsSold): void {
-  const id = event.transaction.hash.toHex();
+  const txHash = event.transaction.hash.toHex();
 
   const receipt = event.receipt;
   const txLogs = receipt ? receipt.logs : [];
@@ -94,6 +96,8 @@ export function handleOptionsSold(event: OptionsSold): void {
   const seller = event.params.seller;
   const otoken = event.params.series.toHex();
   const amount = event.params.optionAmount;
+
+  const id = txHash + "-" + otoken;
 
   const optionsSoldAction = new OptionsSoldAction(id);
 
