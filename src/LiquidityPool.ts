@@ -157,19 +157,6 @@ export function handleBuybackOption(event: BuybackOption): void {
   buybackOptionAction.save();
 }
 
-// export function handleDepositEpochExecuted(event: DepositEpochExecuted): void {
-//   const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
-
-//   const timestamp = event.block.timestamp;
-//   const totalAssets = lpContract.getAssets();
-//   const epoch = event.params.epoch;
-
-//   // const dailyStatSnapshot = getDailySnapshot(timestamp)
-//   // dailyStatSnapshot.totalAssets = dailyStatSnapshot.totalReturns.plus(totalAssets)
-//   // dailyStatSnapshot.epoch = epoch
-//   // dailyStatSnapshot.save()
-// }
-
 export function handleWithdrawalEpochExecuted(
   event: WithdrawalEpochExecuted
 ): void {
