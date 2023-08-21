@@ -1,6 +1,11 @@
 specVersion: 0.0.4
 schema:
   file: ./schema.graphql
+# features:
+#   - grafting
+# graft:
+#  base: QmS4thuQDb5ndFecPrQWAAUoJkkjzjcWXugPBrRP7H2Cq8
+#  block: 106117601
 dataSources:
 
   - kind: ethereum
@@ -12,7 +17,7 @@ dataSources:
       startBlock: {{liquidityPool-start-block}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Deposit
@@ -47,6 +52,59 @@ dataSources:
       file: ./src/LiquidityPool.ts
 
   - kind: ethereum
+    name: optionExchange
+    network: {{network}}
+    source:
+      address: "{{optionExchange}}"
+      abi: optionExchange
+      startBlock: {{optionExchange-start-block}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - OptionsBought
+        - OptionsSold
+        - Collateral
+      abis:
+        - name: optionExchange
+          file: ./abis/optionExchange.json
+      eventHandlers:
+        - event: OptionsBought(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleOptionsBought
+          receipt: true
+        - event: OptionsSold(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleOptionsSold
+          receipt: true
+        - event: CollateralApprovalChanged(indexed address,bool,bool)
+          handler: handleCollateralApprovalChanged
+      file: ./src/optionExchange.ts
+
+  - kind: ethereum
+    name: optionHandler
+    network: {{network}}
+    source:
+      address: "{{optionHandler}}"
+      abi: optionHandler
+      startBlock: {{optionHandler-start-block}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - OptionsBought
+        - OptionsSold
+      abis:
+        - name: optionHandler
+          file: ./abis/optionHandler.json
+      eventHandlers:
+        - event: OptionsBought(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleOptionsBought
+        - event: OptionsSold(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleOptionsSold
+      file: ./src/optionHandler.ts
+
+  - kind: ethereum
     name: OTokenFactory
     network: {{network}}
     source:
@@ -55,7 +113,7 @@ dataSources:
       startBlock: {{oTokenFactory-start-block}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - OtokenCreated
@@ -82,16 +140,26 @@ dataSources:
       startBlock: {{controller-start-block}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - CollateralAssetDeposited
         - CollateralAssetWithdrawed
-        # - Redeem
-        # - ShortOtokenBurned
-        # - ShortOtokenMinted
+        - Redeem
+        - ShortOtokenBurned
+        - ShortOtokenMinted
+        - LongOtokenDeposited
+        - LongOtokenWithdrawed
         - VaultOpened
         - VaultSettled
+        - AccountOperatorUpdated
+        - CallExecuted
+        - CallRestricted
+        - FullPauserUpdated
+        - OwnershipTransferred
+        - PartialPauserUpdated
+        - SystemFullyPaused
+        - SystemPartiallyPaused
       abis:
         - name: Controller
           file: ./abis/Controller.json
@@ -100,18 +168,38 @@ dataSources:
           handler: handleCollateralAssetDeposited
         - event: CollateralAssetWithdrawed(indexed address,indexed address,indexed address,uint256,uint256)
           handler: handleCollateralAssetWithdrawed
-        # - event: Redeem(indexed address,indexed address,indexed address,address,uint256,uint256)
-        #   handler: handleRedeem
-        # - event: ShortOtokenBurned(indexed address,indexed address,indexed address,uint256,uint256)
-        #   handler: handleShortOtokenBurned
-        # - event: ShortOtokenMinted(indexed address,indexed address,indexed address,uint256,uint256)
-        #   handler: handleShortOtokenMinted
+        - event: Redeem(indexed address,indexed address,indexed address,address,uint256,uint256)
+          handler: handleRedeem
+        - event: ShortOtokenBurned(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleShortOtokenBurned
+        - event: ShortOtokenMinted(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleShortOtokenMinted
+        - event: LongOtokenDeposited(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleLongOtokenDeposited
+        - event: LongOtokenWithdrawed(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleLongOtokenWithdrawed
         - event: VaultOpened(indexed address,uint256,indexed uint256)
           handler: handleVaultOpened
         - event: VaultSettled(indexed address,indexed address,address,uint256,uint256,indexed uint256)
           handler: handleVaultSettled
         - event: VaultLiquidated(indexed address,address,indexed address,uint256,uint256,uint256,uint256,indexed address)
           handler: handleLiquidation
+        - event: AccountOperatorUpdated(indexed address,indexed address,bool)
+          handler: handleAccountOperatorUpdated
+        - event: CallExecuted(indexed address,indexed address,bytes)
+          handler: handleCallExecuted
+        - event: CallRestricted(bool)
+          handler: handleCallRestricted
+        - event: FullPauserUpdated(indexed address,indexed address)
+          handler: handleFullPauserUpdated
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: PartialPauserUpdated(indexed address,indexed address)
+          handler: handlePartialPauserUpdated
+        - event: SystemFullyPaused(bool)
+          handler: handleSystemFullyPaused
+        - event: SystemPartiallyPaused(bool)
+          handler: handleSystemPartiallyPaused
       file: ./src/Controller.ts
 
   - kind: ethereum/contract
@@ -123,7 +211,7 @@ dataSources:
       startBlock: {{whitelist-start-block}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - CalleeBlacklisted
@@ -170,7 +258,7 @@ dataSources:
       startBlock: {{addressBook-start-block}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - AddressAdded
@@ -185,6 +273,114 @@ dataSources:
         - event: ProxyCreated(indexed bytes32,indexed address)
           handler: handleProxyCreated
       file: ./src/AddressBook.ts
+
+  - kind: ethereum/contract
+    name: OptionCatalogue
+    network: {{network}}
+    source:
+      address: "{{optionCatalogue}}"
+      abi: OptionCatalogue
+      startBlock: {{optionCatalogue-start-block}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Serie
+        - Expiry
+      abis:
+        - name: OptionCatalogue
+          file: ./abis/OptionCatalogue.json
+      eventHandlers:
+        - event: SeriesApproved(indexed bytes32,uint64,uint128,bool,bool,bool)
+          handler: handleSeriesApproved
+        - event: SeriesAltered(indexed bytes32,uint64,uint128,bool,bool,bool)
+          handler: handleSeriesAltered
+      file: ./src/OptionCatalogue.ts
+
+  - kind: ethereum/contract
+    name: VolatilityFeed
+    network: {{network}}
+    source:
+      address: "{{volatilityFeed}}"
+      abi: VolatilityFeed
+      startBlock: {{volatilityFeed-start-block}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - SABR
+      abis:
+        - name: VolatilityFeed
+          file: ./abis/VolatilityFeed.json
+      eventHandlers:
+        - event: SabrParamsSet(indexed uint256,int32,int32,int32,int32,int32,int32,int32,int32,int256)
+          handler: handleSabrParamsSet
+      file: ./src/VolatilityFeed.ts
+
+  - kind: ethereum/contract
+    name: AlphaPortfolioValuesFeed
+    network: {{network}}
+    source:
+      address: "{{alphaPortfolioValuesFeed}}"
+      abi: AlphaPortfolioValuesFeed
+      startBlock: {{alphaPortfolioValuesFeed-start-block}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Serie
+      abis:
+        - name: AlphaPortfolioValuesFeed
+          file: ./abis/AlphaPortfolioValuesFeed.json
+      eventHandlers:
+        - event: StoresUpdated(address,int256,int256,(uint64,uint128,bool,address,address,address))
+          handler: handleStoresUpdated
+      file: ./src/AlphaPortfolioValuesFeed.ts
+
+  - kind: ethereum/contract
+    name: Oracle
+    network: {{network}}
+    source:
+      address: "{{oracle}}"
+      abi: Oracle
+      startBlock: {{oracle-start-block}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - DisputerUpdated
+        - ExpiryPriceDisputed
+        - ExpiryPriceUpdated
+        - OwnershipTransferred
+        - PricerDisputePeriodUpdated
+        - PricerLockingPeriodUpdated
+        - PricerUpdated
+      abis:
+        - name: Oracle
+          file: ./abis/Oracle.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: DisputerUpdated(indexed address)
+          handler: handleDisputerUpdated
+        - event: ExpiryPriceDisputed(indexed address,indexed uint256,uint256,uint256,uint256)
+          handler: handleExpiryPriceDisputed
+        - event: ExpiryPriceUpdated(indexed address,indexed uint256,uint256,uint256)
+          handler: handleExpiryPriceUpdated
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: PricerDisputePeriodUpdated(indexed address,uint256)
+          handler: handlePricerDisputePeriodUpdated
+        - event: PricerLockingPeriodUpdated(indexed address,uint256)
+          handler: handlePricerLockingPeriodUpdated
+        - event: PricerUpdated(indexed address,indexed address)
+          handler: handlePricerUpdated
+      file: ./src/Oracle.ts
+
 templates:
   - name: OToken
     kind: ethereum
@@ -193,7 +389,7 @@ templates:
       abi: OToken
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - OToken

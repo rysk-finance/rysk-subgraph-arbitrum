@@ -1,47 +1,65 @@
-import { BigInt } from "@graphprotocol/graph-ts"
-import { AddressBook as AddressBookInterface } from '../generated/AddressBook/AddressBook'
-import { OtokenCreated } from "../generated/OTokenFactory/OTokenFactory"
-import { OToken as OTokenSource } from "../generated/templates"
-import { OToken as TokenContract } from "../generated/templates/OToken/OToken"
-import { OTokenFactory as FactoryInterface } from '../generated/OTokenFactory/OTokenFactory'
-import { OToken } from "../generated/schema"
-import { OPTION_REGISTRY } from "./helper"
+import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { OtokenCreated } from "../generated/OTokenFactory/OTokenFactory";
+import { OToken as OTokenSource } from "../generated/templates";
+import { OToken } from "../generated/schema";
+import { WETH_ADDRESS } from "./helper";
 
 export function handleOtokenCreated(event: OtokenCreated): void {
+  // Start indexing the newly created OToken contract
+  OTokenSource.create(event.params.tokenAddress);
 
-  const creator = event.params.creator
+  // bind to the address that emit the event
+  // let factoryContract = FactoryInterface.bind(event.address);
+  // let addressBookAddress = Address.fromString(
+  //   "0xd6e67bf0b1cdb34c37f31a2652812cb30746a94a"
+  // );
+  // let addressBookContract = AddressBookInterface.bind(addressBookAddress);
+  let implementation = Address.fromString(
+    "0x1d96e828e0aa743783919b24ccdb971504a96c77" // Testnet: 0xb19d2ea6f662b13f530cb84b048877e5ed0bd8fe
+  );
 
-  if (creator.toHexString() == OPTION_REGISTRY.toLowerCase()) {
-    // Start indexing the newly created OToken contract
-    OTokenSource.create(event.params.tokenAddress)
+  // Create Otoken Entity
+  let entity = new OToken(event.params.tokenAddress.toHex());
 
-    // bind to the address that emit the event
-    let factoryContract = FactoryInterface.bind(event.address)
-    let addressBookAddress = factoryContract.addressBook()
-    let addressBookContract = AddressBookInterface.bind(addressBookAddress)
-    let implementation = addressBookContract.getOtokenImpl()
-    
-    // Create Otoken Entity
-    let entity = new OToken(event.params.tokenAddress.toHex())
+  entity.underlyingAsset = event.params.underlying.toHex();
+  entity.strikeAsset = event.params.strike.toHex();
+  entity.collateralAsset = event.params.collateral.toHex();
+  entity.strikePrice = event.params.strikePrice;
+  entity.isPut = event.params.isPut;
+  entity.expiryTimestamp = event.params.expiry;
+  entity.creator = event.params.creator;
+  entity.implementation = implementation;
 
-    entity.underlyingAsset = event.params.underlying.toHex()
-    entity.strikeAsset = event.params.strike.toHex()
-    entity.collateralAsset = event.params.collateral.toHex()
-    entity.strikePrice = event.params.strikePrice
-    entity.isPut = event.params.isPut
-    entity.expiryTimestamp = event.params.expiry
-    entity.creator = creator
-    entity.implementation = implementation
+  // let contract = TokenContract.bind(event.params.tokenAddress);
 
-    let contract = TokenContract.bind(event.params.tokenAddress)
-    // Access state variables and functions by calling them
-    entity.symbol = contract.symbol()
-    entity.name = contract.name()
-    entity.decimals = 8
+  // NOTE: This handles well only current cases of WETH as underlying and USDC or WETH as collateral
+  if (entity.underlyingAsset.toString() == WETH_ADDRESS) {
+    const date = new Date(
+      event.params.expiry.times(BigInt.fromString("1000")).toU64()
+    )
+      .toDateString()
+      .split(" "); // ex. ["Fri", "Jun", "30", "2023"]
 
-    entity.save()
+    const expiry = date[2] + date[1].toUpperCase() + date[3].substr(2);
+
+    entity.symbol = "oWETHUSDC/"
+      .concat(entity.collateralAsset == WETH_ADDRESS ? "WETH" : "USDC")
+      .concat("-")
+      .concat(expiry)
+      .concat("-")
+      .concat(entity.strikePrice.toString().substr(0, 4))
+      .concat(entity.isPut ? "P" : "C");
+  } else {
+    entity.symbol = ""; // contract.symbol();
   }
 
+  entity.name = ""; // contract.name();
 
+  entity.decimals = 8;
+
+  entity.totalSupply = BigInt.fromI32(0);
+  entity.createdAt = event.block.timestamp;
+  entity.createdTx = event.transaction.hash;
+
+  entity.save();
 }
-

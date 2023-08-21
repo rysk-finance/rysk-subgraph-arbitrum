@@ -10,13 +10,15 @@
     "deploy:arbitrum": "npm run prepare:arbitrum && graph deploy --node https://api.thegraph.com/deploy/ rysk-finance/rysk",
     "prepare:arbitrum-local": "mustache config/arbitrum-local.json subgraph.template.yaml > subgraph.yaml",
     "create:local": "graph create rysk-local --node http://127.0.0.1:8020",
-    "deploy:local": "graph deploy rysk-local --debug-fork QmWJcbnVSHr66trpwdarRpjnbosohjDxV6KjT5jUsbNfYX --ipfs http://127.0.0.1:5001 --node http://127.0.0.1:8020"
+    "deploy:local": "graph deploy rysk-local --debug-fork QmQzNyEVieMgWkQuFtmk8QhwX6RDZEWreRknWzX5KJRukA --ipfs http://127.0.0.1:5001 --node http://127.0.0.1:8020",
+    "test": "graph test"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.30.4",
-    "@graphprotocol/graph-ts": "0.27.0"
+    "@graphprotocol/graph-ts": "^0.29.3"
   },
   "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.42.4",
+    "matchstick-as": "^0.5.1",
     "mustache": "^4.0.1"
   }
 }

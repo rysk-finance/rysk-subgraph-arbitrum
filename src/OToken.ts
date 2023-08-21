@@ -1,68 +1,140 @@
-import { Transfer } from "../generated/templates/OToken/OToken"
+import { Transfer } from "../generated/templates/OToken/OToken";
 
-import { OToken, AccountBalance } from '../generated/schema'
-import { Address, BigInt } from "@graphprotocol/graph-ts"
-import { BIGINT_ZERO, loadOrCreateAccount, loadOrCreatePosition, ZERO_ADDRESS } from "./helper"
+import {
+  OToken,
+  AccountBalance,
+  OptionsTransferAction
+} from "../generated/schema";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
+import {
+  BIGINT_ZERO,
+  LIQUIDITY_POOL,
+  LIQUIDITY_POOL_OLD,
+  loadOrCreateAccount,
+  OPTION_EXCHANGE,
+  OPTION_EXCHANGE_OLD,
+  OPTION_REGISTRY,
+  updateBuyerPosition,
+  updateSellerPosition,
+  ZERO_ADDRESS
+} from "./helper";
 
 export function handleTransfer(event: Transfer): void {
   // Load oToken entity
-  let entity = OToken.load(event.address.toHex())
-  let amount = event.params.value
-  
-  // convert to 1e18 cause LP handleWriteOptions is 1e18 
-  const amountLP = amount.times( BigInt.fromString('10000000000') )
+  let entity = OToken.load(event.address.toHex());
+  let amount = event.params.value;
 
-  if (event.params.from.toHex() == ZERO_ADDRESS) {
+  const toAddress = event.params.to;
+  const fromAddress = event.params.from;
+
+  // @todo Get these from AddressBook
+  // note old option exchange needs to be excluded cause we are still using it for testing
+  let excludedAddresses = [
+    LIQUIDITY_POOL,
+    LIQUIDITY_POOL_OLD,
+    OPTION_REGISTRY,
+    OPTION_EXCHANGE,
+    OPTION_EXCHANGE_OLD
+  ];
+
+  // convert to 1e18 cause LP handleWriteOptions is 1e18
+  const amountLP = amount.times(BigInt.fromString("10000000000"));
+
+  if (fromAddress.toHex() == ZERO_ADDRESS) {
     // Mint Operation
+    if (entity != null) {
+      entity.totalSupply = entity.totalSupply.plus(amount);
+    }
 
     // update account balance
-    let accountBalance = getOrCreateAccountBalance(event.params.to, entity as OToken)
-    accountBalance.balance = accountBalance.balance.plus(amount)
-    accountBalance.save()
-
-  } else if (event.params.to.toHex() == ZERO_ADDRESS) {
+    let accountBalance = getOrCreateAccountBalance(toAddress, entity as OToken);
+    accountBalance.balance = accountBalance.balance.plus(amount);
+    accountBalance.save();
+  } else if (toAddress.toHex() == ZERO_ADDRESS) {
     // Burn event
+    if (entity != null) {
+      entity.totalSupply = entity.totalSupply.minus(event.params.value);
+    }
 
-    let accountBalance = getOrCreateAccountBalance(event.params.from, entity as OToken)
-    accountBalance.balance = accountBalance.balance.minus(amount)
-    accountBalance.save()
+    let accountBalance = getOrCreateAccountBalance(
+      fromAddress,
+      entity as OToken
+    );
+    accountBalance.balance = accountBalance.balance.minus(amount);
+    accountBalance.save();
   } else {
-    let sourceAccount = getOrCreateAccountBalance(event.params.from, entity as OToken)
-    sourceAccount.balance = sourceAccount.balance.minus(amount)
-    sourceAccount.save()
+    let sourceAccount = getOrCreateAccountBalance(
+      fromAddress,
+      entity as OToken
+    );
+    sourceAccount.balance = sourceAccount.balance.minus(amount);
+    sourceAccount.save();
 
-    let destinationAccount = getOrCreateAccountBalance(event.params.to, entity as OToken)
-    destinationAccount.balance = destinationAccount.balance.plus(amount)
-    destinationAccount.save()
+    let destinationAccount = getOrCreateAccountBalance(
+      toAddress,
+      entity as OToken
+    );
+    destinationAccount.balance = destinationAccount.balance.plus(amount);
+    destinationAccount.save();
 
+    // exclude txs with options registry, exchange and liquidity pool since already handled by OptionsSold and Options Bought
+    if (
+      !(
+        excludedAddresses.includes(toAddress.toHex()) ||
+        excludedAddresses.includes(fromAddress.toHex())
+      )
+    ) {
+      const optionsTransferTransaction = new OptionsTransferAction(
+        event.transaction.hash.toHex()
+      );
 
-    let sourceAccountPosition = loadOrCreatePosition(event.params.from, event.address.toHex());
-    sourceAccountPosition.amount =  sourceAccountPosition.amount.minus( amountLP )
-    sourceAccountPosition.save()
+      optionsTransferTransaction.otoken = event.address.toHex();
+      optionsTransferTransaction.from = fromAddress;
+      optionsTransferTransaction.to = toAddress;
+      optionsTransferTransaction.amount = amount;
+      optionsTransferTransaction.timestamp = event.block.timestamp;
+      optionsTransferTransaction.transactionHash = event.transaction.hash.toHex();
 
-    let destinationAccountPosition = loadOrCreatePosition(event.params.to, event.address.toHex());
-    destinationAccountPosition.amount =  destinationAccountPosition.amount.plus( amountLP )
-    destinationAccountPosition.save()
+      optionsTransferTransaction.save();
+
+      updateBuyerPosition(
+        toAddress,
+        event.address.toHex(),
+        amountLP,
+        optionsTransferTransaction.id
+      );
+
+      updateSellerPosition(
+        fromAddress,
+        event.address.toHex(),
+        amountLP,
+        optionsTransferTransaction.id
+      );
+    }
   }
-
+  if (entity != null) {
+    entity.save();
+  }
 }
 
-function getOrCreateAccountBalance(address: Address, token: OToken): AccountBalance {
-
+function getOrCreateAccountBalance(
+  address: Address,
+  token: OToken
+): AccountBalance {
   // make sure we create the account entity.
-  let accountEntityId = address.toHex()
-  let account = loadOrCreateAccount(accountEntityId)
-  account.save()
+  let accountEntityId = address.toHex();
+  let account = loadOrCreateAccount(accountEntityId);
+  account.save();
 
-  let entityId = address.toHex() + '-' + token.id;
-  let accountBalance = AccountBalance.load(entityId)
-  if (accountBalance != null) return accountBalance as AccountBalance
+  let entityId = address.toHex() + "-" + token.id;
+  let accountBalance = AccountBalance.load(entityId);
+  if (accountBalance != null) return accountBalance as AccountBalance;
 
-  accountBalance = new AccountBalance(entityId)
-  
+  accountBalance = new AccountBalance(entityId);
+
   accountBalance.token = token.id;
-  accountBalance.account = address.toHex()
-  accountBalance.balance = BIGINT_ZERO
+  accountBalance.account = address.toHex();
+  accountBalance.balance = BIGINT_ZERO;
 
-  return accountBalance as AccountBalance
+  return accountBalance as AccountBalance;
 }

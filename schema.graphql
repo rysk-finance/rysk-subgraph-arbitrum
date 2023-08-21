@@ -34,6 +34,38 @@ type RedeemSharesAction @entity {
   timestamp: BigInt!
 }
 
+type OptionsBoughtAction @entity {
+  id: ID!
+  otoken: OToken
+  amount: BigInt!
+  premium: BigInt!
+  fee: BigInt!
+  buyer: Bytes!
+  timestamp: BigInt!
+  transactionHash: String!
+}
+
+type OptionsSoldAction @entity {
+  id: ID!
+  otoken: OToken
+  amount: BigInt!
+  premium: BigInt!
+  fee: BigInt!
+  seller: Bytes!
+  timestamp: BigInt!
+  transactionHash: String!
+}
+
+type OptionsTransferAction @entity {
+  id: ID!
+  otoken: OToken
+  amount: BigInt!
+  from: Bytes!
+  to: Bytes!
+  timestamp: BigInt!
+  transactionHash: String!
+}
+
 type WriteOptionsAction @entity {
   id: ID!
   otoken: OToken
@@ -63,14 +95,14 @@ type RebalanceDeltaAction @entity {
   reactorIndex: Int
 }
 
-type DailyStatSnapshot @entity {
-  id: ID!
-  timestamp: BigInt!
-  totalReturns: BigInt!
-  totalAssets: BigInt!
-  cumulativeYield: BigDecimal
-  epoch: BigInt
-}
+# type DailyStatSnapshot @entity {
+#   id: ID!
+#   timestamp: BigInt!
+#   totalReturns: BigInt!
+#   totalAssets: BigInt!
+#   cumulativeYield: BigDecimal
+#   epoch: BigInt
+# }
 
 type PricePerShare @entity {
   " Equals to ${epoch}"
@@ -81,12 +113,83 @@ type PricePerShare @entity {
   growthSinceFirstEpoch: BigDecimal!
 }
 
+# beyond
+
+type Serie @entity {
+  id: ID!
+  strike: BigInt!
+  expiration: BigInt!
+  isPut: Boolean!
+  isBuyable: Boolean!
+  isSellable: Boolean!
+  netDHVExposure: BigInt!
+}
+
+type Expiry @entity {
+  id: ID!
+  timestamp: BigInt!
+  utc: String!
+}
+
+type Collateral @entity {
+  " Equals to collateral address"
+  id: ID!
+  calls: Boolean!
+  puts: Boolean!
+}
+
+type SABR @entity {
+  " Equals to expiry"
+  id: ID!
+  callAlpha: Int!,
+  callBeta: Int!,
+  callRho: Int!,
+  callVolvol: Int!,
+  putAlpha: Int!,
+  putBeta: Int!,
+  putRho: Int!,
+  putVolvol: Int!,
+  interestRate: BigInt!
+}
+
 # opyn
 
 type Account @entity {
   id: ID!
+
+  "Amount of vaults this account has"
+  vaultCount: BigInt!
+
+  "Array of all vaults"
+  vaults: [Vault!]! @derivedFrom(field: "owner")
+
+  "Amount of operators"
+  operatorCount: BigInt!
+
+  "Array of operator this account has"
+  operators: [AccountOperator!]! @derivedFrom(field: "account")
+
   balances: [AccountBalance!]! @derivedFrom(field: "account")
-  positions: [Position!]! @derivedFrom(field: "account")
+  longPositions: [LongPosition!]! @derivedFrom(field: "account")
+  shortPositions: [ShortPosition!]! @derivedFrom(field: "account")
+}
+
+type Operator @entity {
+  id: ID!
+
+  "Amount of account this operator is controlling"
+  accountCount: BigInt!
+
+  "Array of accounts this operator is controlling"
+  accounts: [AccountOperator!]! @derivedFrom(field: "operator")
+}
+
+# For manage many-to-many relationship between operators and accounts
+type AccountOperator @entity {
+  " Equals to ${account}-${operator}`"
+  id: ID!
+  account: Account
+  operator: Operator
 }
 
 type AccountBalance @entity {
@@ -131,19 +234,64 @@ type OToken @entity {
   strikePrice: BigInt!
   expiryTimestamp: BigInt!
   isPut: Boolean!
+
+  createdAt: BigInt!
+  createdTx: Bytes!
+
+  totalSupply: BigInt!
 }
 
-type Position @entity {
-  "Equals to <account>-<oToken>"
+type LongPosition @entity {
+  "Equals to <account>-<oToken>-l-<id>"
+  id: ID!
+
+  "holder redeem actions (payout)"
+  redeemActions: [RedeemAction!]!
+
+  account: Account!
+  oToken: OToken!
+  netAmount: BigInt!
+  buyAmount: BigInt!
+  sellAmount: BigInt!
+  realizedPnl: BigInt!
+  # writeOptionsTransactions: [WriteOptionsAction!]!
+  # Transactions with Rysk Option Exchange
+  optionsBoughtTransactions: [OptionsBoughtAction!]!
+  optionsSoldTransactions: [OptionsSoldAction!]!
+  # Transfers between users
+  optionsTransferTransactions: [OptionsTransferAction!]!
+
+  "Wheather this is an active or closed position."
+  active: Boolean!
+}
+
+type ShortPosition @entity {
+  "Equals to <account>-<oToken>-s-<id>"
   id: ID!
 
   account: Account!
   oToken: OToken!
-  amount: BigInt!
-  writeOptionsTransactions: [WriteOptionsAction!]!
+
+  netAmount: BigInt!
+  buyAmount: BigInt!
+  sellAmount: BigInt!
+  realizedPnl: BigInt!
+
+  # Transactions with Rysk Option Exchange
+  optionsBoughtTransactions: [OptionsBoughtAction!]!
+  optionsSoldTransactions: [OptionsSoldAction!]!
+
+  "vault settle actions (payout)"
+  settleActions: [SettleAction!]!
+
+  "vault liquidate actions"
+  liquidateActions: [Liquidation!]
 
   "Wheather this is an active or closed position."
   active: Boolean!
+
+  "Vault that this position is associated with."
+  vault: Vault
 }
 
 type Vault @entity {
@@ -180,6 +328,150 @@ interface VaultAction {
   timestamp: BigInt!
 }
 
+type OpenVaultAction implements VaultAction @entity {
+  # Vault fields
+  id: ID!
+  messageSender: Bytes!
+  vault: Vault!
+  block: BigInt!
+  transactionHash: Bytes!
+  timestamp: BigInt!
+}
+
+type MintShortAction implements VaultAction @entity {
+  # Vault fields
+  id: ID!
+  messageSender: Bytes!
+  vault: Vault!
+  block: BigInt!
+  transactionHash: Bytes!
+  timestamp: BigInt!
+
+  " Create oToken to"
+  to: Bytes!
+  " OToken asset"
+  oToken: OToken!
+  " Amount added in the vault"
+  amount: BigInt!
+}
+
+type DepositLongAction implements VaultAction @entity {
+  # Vault fields
+  id: ID!
+  messageSender: Bytes!
+  vault: Vault!
+  block: BigInt!
+  transactionHash: Bytes!
+  timestamp: BigInt!
+
+  # Specific field
+  " oToken sender, either account or operator"
+  from: Bytes!
+  " oToken Asset"
+  oToken: OToken!
+  " oToken added in the vault"
+  amount: BigInt!
+}
+
+type WithdrawLongAction implements VaultAction @entity {
+  # Vault fields
+  id: ID!
+  messageSender: Bytes!
+  vault: Vault!
+  block: BigInt!
+  transactionHash: Bytes!
+  timestamp: BigInt!
+
+  " Long oToken sender, either account or operator"
+  to: Bytes!
+  " Long oToken Asset"
+  oToken: OToken!
+  " Amount added in the vault"
+  amount: BigInt!
+}
+
+type DepositCollateralAction implements VaultAction @entity {
+  # Vault fields
+  id: ID!
+  messageSender: Bytes!
+  vault: Vault!
+  block: BigInt!
+  transactionHash: Bytes!
+  timestamp: BigInt!
+
+  # Specific field
+  " Collateral sender, either account or operator"
+  from: Bytes!
+  " Collateral Asset"
+  asset: ERC20!
+  " Amount added in the vault"
+  amount: BigInt!
+}
+
+type WithdrawCollateralAction implements VaultAction @entity {
+  # Vault fields
+  id: ID!
+  messageSender: Bytes!
+  vault: Vault!
+  block: BigInt!
+  transactionHash: Bytes!
+  timestamp: BigInt!
+
+  " Collateral sender, either account or operator"
+  to: Bytes!
+  " Collateral Asset"
+  asset: ERC20!
+  " Amount added in the vault"
+  amount: BigInt!
+}
+
+type BurnShortAction implements VaultAction @entity {
+  # Vault fields
+  id: ID!
+  messageSender: Bytes!
+  vault: Vault!
+  block: BigInt!
+  transactionHash: Bytes!
+  timestamp: BigInt!
+
+  # Specific field
+  " oToken holder, either account or operator"
+  from: Bytes!
+  " oToken Asset"
+  oToken: OToken!
+  " Amount added in the vault"
+  amount: BigInt!
+}
+
+type RedeemAction @entity {
+  "REDEEM-TxHash-logIndex"
+  id: ID!
+
+  block: BigInt!
+  transactionHash: Bytes!
+  timestamp: BigInt!
+
+  "the account that call _redeem"
+  messageSender: Bytes!
+
+  "the otoken to redeem"
+  oToken: OToken!
+
+  "amount of oToken burned"
+  otokenBurned: BigInt!
+
+  "the asset that payout was denominated in. (Should be the collateral of the token)"
+  payoutAsset: ERC20!
+
+  payoutAmount: BigInt!
+
+  "the payout goes to"
+  receiver: Bytes!
+
+}
+
+
+
 type WhitelistedProduct @entity {
   id: ID!
   underlying: ERC20!
@@ -187,4 +479,102 @@ type WhitelistedProduct @entity {
   collateral: ERC20!
   isPut: Boolean!
   isWhitelisted: Boolean!
+}
+
+type SettleAction implements VaultAction @entity {
+  # Vault fields
+  id: ID!
+  messageSender: Bytes!
+  vault: Vault!
+  block: BigInt!
+  transactionHash: Bytes!
+  timestamp: BigInt!
+
+  "the asset that payout was denominated in. (Should be the collateral of the token)"
+  collateral: ERC20
+
+  "original collateral in the vault"
+  collateralAmount: BigInt
+
+  " Payout to to"
+  to: Bytes!
+
+  "long oToken"
+  long: OToken
+
+  longAmount: BigInt
+
+  "short oToken"
+  short: OToken
+
+  shortAmount: BigInt
+
+  " Amount payout"
+  amount: BigInt!
+}
+
+type Liquidation implements VaultAction @entity {
+  # Vault fields
+  id: ID!
+  messageSender: Bytes!
+  vault: Vault!
+  block: BigInt!
+  transactionHash: Bytes!
+  timestamp: BigInt!
+
+  # Liquidation
+  # auctionPrice: BigInt!
+  # auctionStartingRound: BigInt!
+  collateralPayout: BigInt!
+  debtAmount: BigInt!
+  liquidator: Bytes!
+}
+
+type Oracle @entity {
+  id: ID!
+
+  disputer: Bytes!
+}
+type OracleAsset @entity {
+  "the address of the asset"
+  id: ID!
+
+  asset: ERC20!
+  "pricer for the asset"
+  pricer: OraclePricer!
+  prices: [ExpiryPrice!]! @derivedFrom(field: "asset")
+}
+type OraclePricer @entity {
+  "address of the pricer"
+  id: ID!
+  "locking period for this pricer"
+  lockingPeriod: BigInt!
+  "disput period for this pricer"
+  disputePeriod: BigInt!
+}
+type ExpiryPrice @entity {
+  "asset-expiry"
+  id: ID!
+  "the asset"
+  asset: OracleAsset!
+  "timestamp"
+  expiry: BigInt!
+  # "the transaction hash"
+  reportedTx: Bytes!
+  "timestamp reported by pricer"
+  reportedTimestamp: BigInt!
+  "price in USD sacled by 1e8"
+  price: BigInt!
+  "if the price is overrided by the disputer"
+  isDisputed: Boolean!
+}
+
+# Dashboard
+
+type Stat @entity {
+  id: ID!
+  totalFeesSold: BigInt!
+  totalFeesBought: BigInt!
+  volumeOptionsBought: BigInt!
+  volumeOptionsSold: BigInt!
 }

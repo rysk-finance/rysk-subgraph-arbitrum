@@ -1,4 +1,4 @@
-import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts"
+import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts";
 import {
   BuybackOption,
   Deposit,
@@ -10,266 +10,264 @@ import {
   liquidityPool,
   WithdrawalEpochExecuted,
   RebalancePortfolioDelta
-} from "../generated/liquidityPool/liquidityPool"
-import { 
+} from "../generated/liquidityPool/liquidityPool";
+import {
   BuybackOptionAction,
-  DailyStatSnapshot,
-  DepositAction, 
-  InitiateWithdrawAction, 
+  // DailyStatSnapshot,
+  DepositAction,
+  InitiateWithdrawAction,
   LPBalance,
   RedeemSharesAction,
   RebalanceDeltaAction,
-  WithdrawAction, 
+  WithdrawAction,
   WriteOptionsAction,
   PricePerShare
-} from "../generated/schema"
-import { BIGINT_ZERO, updateBuyerPosition, LIQUIDITY_POOL, BIGDECIMAL_ZERO } from "./helper"
+} from "../generated/schema";
+import { BIGINT_ZERO, LIQUIDITY_POOL } from "./helper";
 
 export function handleDeposit(event: Deposit): void {
+  const depositAction = new DepositAction(event.transaction.hash.toHex());
 
-  const depositAction = new DepositAction(event.transaction.hash.toHex())
+  depositAction.address = event.params.recipient;
+  depositAction.amount = event.params.amount;
+  depositAction.epoch = event.params.epoch;
+  depositAction.timestamp = event.block.timestamp;
 
-  depositAction.address = event.params.recipient
-  depositAction.amount = event.params.amount
-  depositAction.epoch = event.params.epoch
-  depositAction.timestamp = event.block.timestamp
+  depositAction.save();
 
-  depositAction.save()
+  let lp = LPBalance.load(event.params.recipient.toHex());
 
-  let lp = LPBalance.load(event.params.recipient.toHex())
+  if (lp == null) {
+    lp = new LPBalance(event.params.recipient.toHex());
+    lp.balance = BIGINT_ZERO;
+  }
 
-  if (lp == null ) {
-    lp = new LPBalance(event.params.recipient.toHex())
-    lp.balance = BIGINT_ZERO
-  } 
-
-  lp.balance = lp.balance.plus(event.params.amount)
-  lp.save()
-
+  lp.balance = lp.balance.plus(event.params.amount);
+  lp.save();
 }
 
 export function handleInitiateWithdraw(event: InitiateWithdraw): void {
+  const initiateWithdrawAction = new InitiateWithdrawAction(
+    event.transaction.hash.toHex()
+  );
 
-  const initiateWithdrawAction = new InitiateWithdrawAction(event.transaction.hash.toHex())
+  initiateWithdrawAction.address = event.params.recipient;
+  initiateWithdrawAction.amount = event.params.amount;
+  initiateWithdrawAction.epoch = event.params.epoch;
+  initiateWithdrawAction.timestamp = event.block.timestamp;
 
-  initiateWithdrawAction.address = event.params.recipient
-  initiateWithdrawAction.amount = event.params.amount
-  initiateWithdrawAction.epoch = event.params.epoch
-  initiateWithdrawAction.timestamp = event.block.timestamp
-
-  initiateWithdrawAction.save()
-
+  initiateWithdrawAction.save();
 }
 
 export function handleRedeem(event: Redeem): void {
-  const redeemSharesAction = new RedeemSharesAction(event.transaction.hash.toHex())
+  const redeemSharesAction = new RedeemSharesAction(
+    event.transaction.hash.toHex()
+  );
 
-  redeemSharesAction.address = event.params.recipient
-  redeemSharesAction.amount = event.params.amount
-  redeemSharesAction.epoch = event.params.epoch
-  redeemSharesAction.timestamp = event.block.timestamp
+  redeemSharesAction.address = event.params.recipient;
+  redeemSharesAction.amount = event.params.amount;
+  redeemSharesAction.epoch = event.params.epoch;
+  redeemSharesAction.timestamp = event.block.timestamp;
 
-  redeemSharesAction.save()  
+  redeemSharesAction.save();
 }
 
 export function handleWithdraw(event: Withdraw): void {
+  const withdrawAction = new WithdrawAction(event.transaction.hash.toHex());
 
-  const withdrawAction = new WithdrawAction(event.transaction.hash.toHex())
+  withdrawAction.address = event.params.recipient;
+  withdrawAction.amount = event.params.amount;
+  withdrawAction.timestamp = event.block.timestamp;
 
-  withdrawAction.address = event.params.recipient
-  withdrawAction.amount = event.params.amount
-  withdrawAction.timestamp = event.block.timestamp
+  withdrawAction.save();
 
-  withdrawAction.save()
-
-  let lp = LPBalance.load(event.params.recipient.toHex())
+  let lp = LPBalance.load(event.params.recipient.toHex());
 
   if (lp) {
-    lp.balance = lp.balance ? lp.balance.minus(event.params.amount) : event.params.amount
-    lp.save()
+    lp.balance = lp.balance
+      ? lp.balance.minus(event.params.amount)
+      : event.params.amount;
+    lp.save();
   }
-
 }
 
 export function handleWriteOption(event: WriteOption): void {
-
   // const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
 
-  const buyer = event.params.buyer
-  const oToken = event.params.series.toHex()
-  const amount = event.params.amount
-  const premium = event.params.premium.times(BigInt.fromString("1000000000000")) // premium is 1e6 so needed to converted to 1e18 as amount 
-  const timestamp = event.block.timestamp
+  const buyer = event.params.buyer;
+  const oToken = event.params.series.toHex();
+  const amount = event.params.amount;
+  const premium = event.params.premium.times(
+    BigInt.fromString("1000000000000")
+  ); // premium is 1e6 so needed to converted to 1e18 as amount
+  const timestamp = event.block.timestamp;
 
-  const id = event.transaction.hash.toHex() + "-" + oToken 
+  const id = event.transaction.hash.toHex() + "-" + oToken;
 
-  const writeOptionAction = new WriteOptionsAction(id)
-  
-  writeOptionAction.otoken = oToken
-  writeOptionAction.amount = amount //1e18
-  writeOptionAction.premium = premium
-  writeOptionAction.buyer = buyer
-  writeOptionAction.escrow = event.params.escrow
-  writeOptionAction.timestamp = timestamp
-  writeOptionAction.transactionHash = event.transaction.hash.toHex()
+  const writeOptionAction = new WriteOptionsAction(id);
 
+  writeOptionAction.otoken = oToken;
+  writeOptionAction.amount = amount; //1e18
+  writeOptionAction.premium = premium;
+  writeOptionAction.buyer = buyer;
+  writeOptionAction.escrow = event.params.escrow;
+  writeOptionAction.timestamp = timestamp;
+  writeOptionAction.transactionHash = event.transaction.hash.toHex();
 
-  writeOptionAction.save()
+  writeOptionAction.save();
 
-  updateBuyerPosition(buyer, oToken, amount, id);
-
+  // updateOptionPosition(buyer, oToken, amount, id);
 
   // update total returns on daily snapshot
   // using the alpha launch timestamp to remove the test data 1664553600
-  if (timestamp.toI32() >= 1664553600 ) {
-    const dailyStatSnapshot = getDailySnapshot(timestamp)
-    dailyStatSnapshot.totalReturns = dailyStatSnapshot.totalReturns.plus(premium)
-    // const totalAssets = lpContract.getAssets()
-    // dailyStatSnapshot.totalAssets = totalAssets
-    
-    dailyStatSnapshot.cumulativeYield = (dailyStatSnapshot.totalReturns.toBigDecimal())
-                                        .div(dailyStatSnapshot.totalAssets.toBigDecimal())
-    dailyStatSnapshot.save()
-  }
+  // if (timestamp.toI32() >= 1664553600 ) {
+  // const dailyStatSnapshot = getDailySnapshot(timestamp)
+  // dailyStatSnapshot.totalReturns = dailyStatSnapshot.totalReturns.plus(premium)
+  // const totalAssets = lpContract.getAssets()
+  // dailyStatSnapshot.totalAssets = totalAssets
 
+  // dailyStatSnapshot.cumulativeYield = (dailyStatSnapshot.totalReturns.toBigDecimal())
+  // .div(dailyStatSnapshot.totalAssets.toBigDecimal())
+  // dailyStatSnapshot.save()
+  // }
 }
 
-
 export function handleBuybackOption(event: BuybackOption): void {
+  const seller = event.params.seller;
+  const oToken = event.params.series.toHex();
+  const amount = event.params.amount;
+  const premium = event.params.premium.times(
+    BigInt.fromString("1000000000000")
+  ); // premium is 1e6 so needed to converted to 1e18 as amount
+  const timestamp = event.block.timestamp;
 
-  const seller = event.params.seller
-  const oToken = event.params.series.toHex()
-  const amount = event.params.amount
-  const premium = event.params.premium.times(BigInt.fromString("1000000000000")) // premium is 1e6 so needed to converted to 1e18 as amount 
-  const timestamp = event.block.timestamp
+  const id = event.transaction.hash.toHex() + "-" + oToken;
 
-  const id = event.transaction.hash.toHex() + "-" + oToken 
+  const buybackOptionAction = new BuybackOptionAction(
+    event.transaction.hash.toHex()
+  );
 
+  buybackOptionAction.otoken = oToken;
+  buybackOptionAction.amount = amount; //1e18
+  buybackOptionAction.premium = premium;
+  buybackOptionAction.seller = seller;
+  buybackOptionAction.timestamp = timestamp;
+  buybackOptionAction.transactionHash = event.transaction.hash.toHex();
 
-  const buybackOptionAction = new BuybackOptionAction(event.transaction.hash.toHex())
-
-  buybackOptionAction.otoken = oToken
-  buybackOptionAction.amount = amount //1e18
-  buybackOptionAction.premium = premium
-  buybackOptionAction.seller = seller
-  buybackOptionAction.timestamp = timestamp
-  buybackOptionAction.transactionHash = event.transaction.hash.toHex()
-
-  buybackOptionAction.save()
-
+  buybackOptionAction.save();
 }
 
 export function handleDepositEpochExecuted(event: DepositEpochExecuted): void {
-
   const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
 
-  const timestamp = event.block.timestamp
-  const totalAssets = lpContract.getAssets()
-  const epoch = event.params.epoch
+  const timestamp = event.block.timestamp;
+  const totalAssets = lpContract.getAssets();
+  const epoch = event.params.epoch;
 
-  const dailyStatSnapshot = getDailySnapshot(timestamp)
-  dailyStatSnapshot.totalAssets = dailyStatSnapshot.totalReturns.plus(totalAssets)
-  dailyStatSnapshot.epoch = epoch
-  dailyStatSnapshot.save()
-
+  // const dailyStatSnapshot = getDailySnapshot(timestamp)
+  // dailyStatSnapshot.totalAssets = dailyStatSnapshot.totalReturns.plus(totalAssets)
+  // dailyStatSnapshot.epoch = epoch
+  // dailyStatSnapshot.save()
 }
 
-export function handleWithdrawalEpochExecuted(event: WithdrawalEpochExecuted): void {
-
+export function handleWithdrawalEpochExecuted(
+  event: WithdrawalEpochExecuted
+): void {
   const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
 
-  const timestamp = event.block.timestamp
-  const totalAssets = lpContract.getAssets()
-  const epoch = event.params.epoch
+  const timestamp = event.block.timestamp;
+  const totalAssets = lpContract.getAssets();
+  const epoch = event.params.epoch;
 
-  const dailyStatSnapshot = getDailySnapshot(timestamp)
-  dailyStatSnapshot.totalAssets = dailyStatSnapshot.totalReturns.plus(totalAssets)
-  dailyStatSnapshot.epoch = epoch
-  dailyStatSnapshot.save()
+  // const dailyStatSnapshot = getDailySnapshot(timestamp)
+  // dailyStatSnapshot.totalAssets = dailyStatSnapshot.totalReturns.plus(totalAssets)
+  // dailyStatSnapshot.epoch = epoch
+  // dailyStatSnapshot.save()
 
-  const epochString = epoch.toString()
+  const epochString = epoch.toString();
 
-  const currentPricePerShare = lpContract.withdrawalEpochPricePerShare(epoch)
-  const initialPricePerShare = lpContract.withdrawalEpochPricePerShare(BigInt.fromI32(0))
+  const currentPricePerShare = lpContract.withdrawalEpochPricePerShare(epoch);
+  const initialPricePerShare = lpContract.withdrawalEpochPricePerShare(
+    BigInt.fromI32(0)
+  );
 
-  let pricePerShare = new PricePerShare(epochString)
+  let pricePerShare = new PricePerShare(epochString);
 
-  pricePerShare.epoch = epoch
-  pricePerShare.timestamp = timestamp
+  pricePerShare.epoch = epoch;
+  pricePerShare.timestamp = timestamp;
 
   /** Percentage Increase = [ (Final Value - Starting Value) / |Starting Value| ] × 100 */
-  pricePerShare.growthSinceFirstEpoch = ((currentPricePerShare.minus(initialPricePerShare).toBigDecimal())
-      .div(initialPricePerShare.toBigDecimal()))
-      .times(BigDecimal.fromString('100'))
-  pricePerShare.value = currentPricePerShare
+  pricePerShare.growthSinceFirstEpoch = currentPricePerShare
+    .minus(initialPricePerShare)
+    .toBigDecimal()
+    .div(initialPricePerShare.toBigDecimal())
+    .times(BigDecimal.fromString("100"));
+  pricePerShare.value = currentPricePerShare;
 
-  pricePerShare.save()
-
+  pricePerShare.save();
 }
 
-export function handleRebalancePortfolioDelta(event: RebalancePortfolioDelta): void {
+export function handleRebalancePortfolioDelta(
+  event: RebalancePortfolioDelta
+): void {
+  const id = event.transaction.hash.toHex();
+  const timestamp = event.block.timestamp;
 
-  const id = event.transaction.hash.toHex()
-  const timestamp = event.block.timestamp
+  const rebalanceDeltaAction = new RebalanceDeltaAction(id);
+  rebalanceDeltaAction.timestamp = timestamp;
+  rebalanceDeltaAction.deltaChange = event.params.deltaChange;
+  rebalanceDeltaAction.transactionHash = event.transaction.hash.toHex();
 
-  const rebalanceDeltaAction = new RebalanceDeltaAction(id)
-  rebalanceDeltaAction.timestamp = timestamp
-  rebalanceDeltaAction.deltaChange = event.params.deltaChange
-  rebalanceDeltaAction.transactionHash = event.transaction.hash.toHex()
-
-  rebalanceDeltaAction.save()
+  rebalanceDeltaAction.save();
 
   const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
 
-  const totalAssets = lpContract.getAssets()
+  const totalAssets = lpContract.getAssets();
 
-  const dailyStatSnapshot = getDailySnapshot(timestamp)
-  dailyStatSnapshot.totalAssets = dailyStatSnapshot.totalReturns.plus(totalAssets)
-  dailyStatSnapshot.save()
-
+  // const dailyStatSnapshot = getDailySnapshot(timestamp)
+  // dailyStatSnapshot.totalAssets = dailyStatSnapshot.totalReturns.plus(totalAssets)
+  // dailyStatSnapshot.save()
 }
 
+// function getDailySnapshot(timestamp: BigInt): DailyStatSnapshot {
 
-function getDailySnapshot(timestamp: BigInt): DailyStatSnapshot {
-  
-  let dayID = timestamp.toI32() / 86400
-  let dayStartUnix = dayID * 86400
-  let dayStartUnixBigInt = BigInt.fromI32(dayStartUnix)
+//   let dayID = timestamp.toI32() / 86400
+//   let dayStartUnix = dayID * 86400
+//   let dayStartUnixBigInt = BigInt.fromI32(dayStartUnix)
 
-  let dailyStatSnapshot = DailyStatSnapshot.load('last')  
+//   let dailyStatSnapshot = DailyStatSnapshot.load('last')
 
-  const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
+//   const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
 
-  if (dailyStatSnapshot === null) { 
-    dailyStatSnapshot = new DailyStatSnapshot('last')
-    dailyStatSnapshot.totalReturns  = BIGINT_ZERO
+//   if (dailyStatSnapshot === null) {
+//     dailyStatSnapshot = new DailyStatSnapshot('last')
+//     dailyStatSnapshot.totalReturns  = BIGINT_ZERO
 
-    const totalAssets = lpContract.getAssets()
-    dailyStatSnapshot.totalAssets  = totalAssets
+//     const totalAssets = lpContract.getAssets()
+//     dailyStatSnapshot.totalAssets  = totalAssets
 
-    dailyStatSnapshot.cumulativeYield = BIGDECIMAL_ZERO
-    dailyStatSnapshot.epoch  = BIGINT_ZERO
-    dailyStatSnapshot.timestamp = dayStartUnixBigInt
-  }
+//     dailyStatSnapshot.cumulativeYield = BIGDECIMAL_ZERO
+//     dailyStatSnapshot.epoch  = BIGINT_ZERO
+//     dailyStatSnapshot.timestamp = dayStartUnixBigInt
+//   }
 
+//   if (dailyStatSnapshot !== null && dailyStatSnapshot.timestamp.notEqual(dayStartUnixBigInt) ) {
+//     const totalReturns = dailyStatSnapshot.totalReturns
+//     const totalAssets = dailyStatSnapshot.totalAssets
+//     const cumulativeYield = dailyStatSnapshot.cumulativeYield
+//     const epoch = dailyStatSnapshot.epoch
 
-  if (dailyStatSnapshot !== null && dailyStatSnapshot.timestamp.notEqual(dayStartUnixBigInt) ) {
-    const totalReturns = dailyStatSnapshot.totalReturns
-    const totalAssets = dailyStatSnapshot.totalAssets
-    const cumulativeYield = dailyStatSnapshot.cumulativeYield
-    const epoch = dailyStatSnapshot.epoch
-    
-    dailyStatSnapshot.id = dailyStatSnapshot.timestamp.toString()
-    dailyStatSnapshot.save()
-    
-    dailyStatSnapshot = new DailyStatSnapshot('last')
-    dailyStatSnapshot.totalReturns  = totalReturns
-    dailyStatSnapshot.totalAssets  = totalAssets
-    dailyStatSnapshot.cumulativeYield  = cumulativeYield
-    dailyStatSnapshot.epoch  = epoch
-    dailyStatSnapshot.timestamp = dayStartUnixBigInt
-  }
+//     dailyStatSnapshot.id = dailyStatSnapshot.timestamp.toString()
+//     dailyStatSnapshot.save()
 
-  return dailyStatSnapshot as DailyStatSnapshot
+//     dailyStatSnapshot = new DailyStatSnapshot('last')
+//     dailyStatSnapshot.totalReturns  = totalReturns
+//     dailyStatSnapshot.totalAssets  = totalAssets
+//     dailyStatSnapshot.cumulativeYield  = cumulativeYield
+//     dailyStatSnapshot.epoch  = epoch
+//     dailyStatSnapshot.timestamp = dayStartUnixBigInt
+//   }
 
-}
+//   return dailyStatSnapshot as DailyStatSnapshot
+
+// }
