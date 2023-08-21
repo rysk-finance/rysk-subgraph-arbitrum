@@ -13,15 +13,15 @@ export let BIGDECIMAL_ZERO = BigDecimal.fromString("0");
 export let BIGDECIMAL_ONE = BigDecimal.fromString("1");
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const LIQUIDITY_POOL = "0x217749d9017cb87712654422a1f5856aaa147b80"; // Testnet: 0x0b1bf5fb77aa36cd48baa1395bc2b5fa0f135d8c
+export const LIQUIDITY_POOL = "0x0b1bf5fb77aa36cd48baa1395bc2b5fa0f135d8c"; // Testnet: 0x0b1bf5fb77aa36cd48baa1395bc2b5fa0f135d8c
 export const LIQUIDITY_POOL_OLD = "0xc10b976c671ce9bff0723611f01422acbae100a5"; // Mainnet
-export const OPTION_EXCHANGE = "0xc117bf3103bd09552f9a721f0b8bce9843aae1fa"; // Testnet: 0xb672fe86693bf6f3b034730f5d2c77c8844d6b45
+export const OPTION_EXCHANGE = "0xb672fe86693bf6f3b034730f5d2c77c8844d6b45"; // Testnet: 0xb672fe86693bf6f3b034730f5d2c77c8844d6b45
 export const OPTION_EXCHANGE_OLD = "0x04706de6ce851a284b569ebae2e258225d952368"; // OptionRegistry, Testnet: 0x63ce41ca4e30e75caf9b561e0250c25056b6e2c0
-export const OPTION_REGISTRY = "0x8bc23878981a207860ba4b185fd065f4fd3c7725"; // Testnet: 0x4e89cc3215af050ceb63ca62470eec7c1a66f737
-export const CONTROLLER = "0x594bd4ec29f7900ae29549c140ac53b5240d4019"; // Testnet: 0x11a602a5f5d823c103bb8b7184e22391aae5f4c2
+export const OPTION_REGISTRY = "0x4e89cc3215af050ceb63ca62470eec7c1a66f737"; // Testnet: 0x4e89cc3215af050ceb63ca62470eec7c1a66f737
+export const CONTROLLER = "0x11a602a5f5d823c103bb8b7184e22391aae5f4c2"; // Testnet: 0x11a602a5f5d823c103bb8b7184e22391aae5f4c2
 
-export const WETH_ADDRESS = "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"; // Testnet: 0x3b3a1de07439eeb04492fa64a889ee25a130cdd3
-export const USDC_ADDRESS = "0xaf88d065e77c8cc2239327c5edb3a432268e5831"; // Testnet: 0x408c5755b5c7a0a28d851558ea3636cfc5b5b19d
+export const WETH_ADDRESS = "0x3b3a1de07439eeb04492fa64a889ee25a130cdd3"; // Testnet: 0x3b3a1de07439eeb04492fa64a889ee25a130cdd3
+export const USDC_ADDRESS = "0x408c5755b5c7a0a28d851558ea3636cfc5b5b19d"; // Testnet: 0x408c5755b5c7a0a28d851558ea3636cfc5b5b19d
 
 export const SHORT_OTOKEN_BURNED =
   "0xdd96b18f26fd9950581b9fd821fa907fc318845fc4d220b825a7b19bfdd174e8";

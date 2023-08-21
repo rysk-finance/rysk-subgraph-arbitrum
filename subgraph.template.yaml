@@ -35,8 +35,6 @@ dataSources:
           handler: handleDeposit
         - event: BuybackOption(address,uint256,uint256,uint256,address)
           handler: handleBuybackOption
-        - event: DepositEpochExecuted(uint256)
-          handler: handleDepositEpochExecuted
         - event: InitiateWithdraw(address,uint256,uint256)
           handler: handleInitiateWithdraw
         - event: RebalancePortfolioDelta(int256)
