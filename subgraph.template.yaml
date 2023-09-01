@@ -30,6 +30,8 @@ dataSources:
       abis:
         - name: liquidityPool
           file: ./abis/liquidityPool.json
+        - name: chainlinkAggregator
+          file: ./abis/AggregatorV3__ABI.json
       eventHandlers:
         - event: Deposit(address,uint256,uint256)
           handler: handleDeposit

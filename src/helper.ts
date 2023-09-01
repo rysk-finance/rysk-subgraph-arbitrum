@@ -13,7 +13,8 @@ export let BIGDECIMAL_ZERO = BigDecimal.fromString("0");
 export let BIGDECIMAL_ONE = BigDecimal.fromString("1");
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const LIQUIDITY_POOL = "0x0b1bf5fb77aa36cd48baa1395bc2b5fa0f135d8c"; // Testnet: 0x0b1bf5fb77aa36cd48baa1395bc2b5fa0f135d8c
+export const LIQUIDITY_POOL = "0x0b1bf5fb77aa36cd48baa1395bc2b5fa0f135d8c"; 
+export const CHAINLINK_AGGREGATOR = "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08";
 export const LIQUIDITY_POOL_OLD = "0xc10b976c671ce9bff0723611f01422acbae100a5"; // Mainnet
 export const OPTION_EXCHANGE = "0xb672fe86693bf6f3b034730f5d2c77c8844d6b45"; // Testnet: 0xb672fe86693bf6f3b034730f5d2c77c8844d6b45
 export const OPTION_EXCHANGE_OLD = "0x63ce41ca4e30e75caf9b561e0250c25056b6e2c0"; // OptionRegistry, Testnet: 0x63ce41ca4e30e75caf9b561e0250c25056b6e2c0
