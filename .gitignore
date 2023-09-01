@@ -4,3 +4,6 @@ generated
 
 # auto-generated
 subgraph.yaml
+
+# yarn
+yarn-error.log
