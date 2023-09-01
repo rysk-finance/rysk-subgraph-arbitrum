@@ -1,24 +1,24 @@
 {
-  "name": "rysktestnet",
-  "license": "UNLICENSED",
-  "scripts": {
-    "codegen": "graph codegen",
-    "build": "graph build",
-    "prepare:arbitrum-goerli": "mustache config/arbitrum-goerli.json subgraph.template.yaml > subgraph.yaml",
-    "deploy:arbitrum-goerli": "npm run prepare:arbitrum-goerli && graph deploy --node https://api.thegraph.com/deploy/ devey/rysk-goerli-yassine",
-    "prepare:arbitrum": "mustache config/arbitrum.json subgraph.template.yaml > subgraph.yaml",
-    "deploy:arbitrum": "npm run prepare:arbitrum && graph deploy --node https://api.thegraph.com/deploy/ rysk-finance/rysk",
-    "prepare:arbitrum-local": "mustache config/arbitrum-local.json subgraph.template.yaml > subgraph.yaml",
-    "create:local": "graph create rysk-local --node http://127.0.0.1:8020",
-    "deploy:local": "graph deploy rysk-local --debug-fork QmQzNyEVieMgWkQuFtmk8QhwX6RDZEWreRknWzX5KJRukA --ipfs http://127.0.0.1:5001 --node http://127.0.0.1:8020",
-    "test": "graph test"
-  },
-  "dependencies": {
-    "@graphprotocol/graph-ts": "^0.29.3"
-  },
-  "devDependencies": {
-    "@graphprotocol/graph-cli": "^0.42.4",
-    "matchstick-as": "^0.5.1",
-    "mustache": "^4.0.1"
-  }
+    "name": "rysktestnet",
+    "license": "UNLICENSED",
+    "scripts": {
+        "codegen": "graph codegen",
+        "build": "graph build",
+        "prepare:arbitrum-goerli": "mustache config/arbitrum-goerli.json subgraph.template.yaml > subgraph.yaml",
+        "deploy:arbitrum-goerli": "npm run prepare:arbitrum-goerli && graph deploy --node https://api.thegraph.com/deploy/ devey/rysk-goerli-yassine",
+        "prepare:arbitrum": "mustache config/arbitrum.json subgraph.template.yaml > subgraph.yaml",
+        "deploy:arbitrum": "npm run prepare:arbitrum && graph deploy --node https://api.thegraph.com/deploy/ rysk-finance/rysk",
+        "prepare:arbitrum-local": "mustache config/arbitrum-local.json subgraph.template.yaml > subgraph.yaml",
+        "create:local": "graph create rysk-local --node http://127.0.0.1:8020",
+        "deploy:local": "graph deploy rysk-local --debug-fork QmQzNyEVieMgWkQuFtmk8QhwX6RDZEWreRknWzX5KJRukA --ipfs http://127.0.0.1:5001 --node http://127.0.0.1:8020",
+        "test": "graph test"
+    },
+    "dependencies": {
+        "@graphprotocol/graph-ts": "^0.31.0"
+    },
+    "devDependencies": {
+        "@graphprotocol/graph-cli": "^0.56.0",
+        "matchstick-as": "^0.5.2",
+        "mustache": "^4.2.0"
+    }
 }
