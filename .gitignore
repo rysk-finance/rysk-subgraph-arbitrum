@@ -7,3 +7,6 @@ subgraph.yaml
 
 # yarn
 yarn-error.log
+
+# vscode
+.vscode

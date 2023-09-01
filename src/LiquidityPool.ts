@@ -11,6 +11,7 @@ import {
   WithdrawalEpochExecuted,
   RebalancePortfolioDelta
 } from "../generated/liquidityPool/liquidityPool";
+import { chainlinkAggregator } from '../generated/liquidityPool/chainlinkAggregator'
 import {
   BuybackOptionAction,
   // DailyStatSnapshot,
@@ -23,7 +24,7 @@ import {
   WriteOptionsAction,
   PricePerShare
 } from "../generated/schema";
-import { BIGINT_ZERO, LIQUIDITY_POOL } from "./helper";
+import { BIGINT_ZERO, LIQUIDITY_POOL, CHAINLINK_AGGREGATOR } from "./helper";
 
 export function handleDeposit(event: Deposit): void {
   const depositAction = new DepositAction(event.transaction.hash.toHex());
@@ -161,6 +162,7 @@ export function handleWithdrawalEpochExecuted(
   event: WithdrawalEpochExecuted
 ): void {
   const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
+  const chainlinkAggregatorContract = chainlinkAggregator.bind(Address.fromString(CHAINLINK_AGGREGATOR))
 
   const timestamp = event.block.timestamp;
   // const totalAssets = lpContract.getAssets();
@@ -190,6 +192,9 @@ export function handleWithdrawalEpochExecuted(
     .div(initialPricePerShare.toBigDecimal())
     .times(BigDecimal.fromString("100"));
   pricePerShare.value = currentPricePerShare;
+
+  const ethPrice = chainlinkAggregatorContract.latestAnswer()
+  pricePerShare.ethPrice = ethPrice
 
   pricePerShare.save();
 }
