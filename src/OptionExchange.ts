@@ -16,8 +16,12 @@ import {
   SHORT_OTOKEN_BURNED,
   SHORT_OTOKEN_MINTED,
   updateOptionLongPosition,
-  updateOptionShortPosition
+  updateOptionShortPosition,
+  CHAINLINK_AGGREGATOR
 } from "./helper";
+
+import { chainlinkAggregator } from '../generated/liquidityPool/chainlinkAggregator'
+import { Address } from "@graphprotocol/graph-ts";
 
 export function handleCollateralApprovalChanged(
   event: CollateralApprovalChanged
@@ -41,6 +45,9 @@ export function handleCollateralApprovalChanged(
 }
 
 export function handleOptionsBought(event: OptionsBought): void {
+
+  const chainlinkAggregatorContract = chainlinkAggregator.bind(Address.fromString(CHAINLINK_AGGREGATOR))
+
   const txHash = event.transaction.hash.toHex();
 
   const receipt = event.receipt;
@@ -61,6 +68,9 @@ export function handleOptionsBought(event: OptionsBought): void {
   optionsBoughtAction.fee = event.params.fee;
   optionsBoughtAction.timestamp = event.block.timestamp;
   optionsBoughtAction.transactionHash = event.transaction.hash.toHex();
+
+  const ethPrice = chainlinkAggregatorContract.latestAnswer()
+  optionsBoughtAction.ethPrice = ethPrice;
 
   optionsBoughtAction.save();
 
@@ -88,6 +98,9 @@ export function handleOptionsBought(event: OptionsBought): void {
 }
 
 export function handleOptionsSold(event: OptionsSold): void {
+
+  const chainlinkAggregatorContract = chainlinkAggregator.bind(Address.fromString(CHAINLINK_AGGREGATOR))
+
   const txHash = event.transaction.hash.toHex();
 
   const receipt = event.receipt;
@@ -108,6 +121,9 @@ export function handleOptionsSold(event: OptionsSold): void {
   optionsSoldAction.fee = event.params.fee;
   optionsSoldAction.timestamp = event.block.timestamp;
   optionsSoldAction.transactionHash = event.transaction.hash.toHex();
+
+  const ethPrice = chainlinkAggregatorContract.latestAnswer()
+  optionsSoldAction.ethPrice = ethPrice;
 
   optionsSoldAction.save();
 
