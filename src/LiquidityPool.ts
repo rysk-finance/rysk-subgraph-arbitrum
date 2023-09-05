@@ -202,6 +202,8 @@ export function handleWithdrawalEpochExecuted(
 export function handleRebalancePortfolioDelta(
   event: RebalancePortfolioDelta
 ): void {
+  const chainlinkAggregatorContract = chainlinkAggregator.bind(Address.fromString(CHAINLINK_AGGREGATOR))
+  
   const id = event.transaction.hash.toHex();
   const timestamp = event.block.timestamp;
 
@@ -210,56 +212,9 @@ export function handleRebalancePortfolioDelta(
   rebalanceDeltaAction.deltaChange = event.params.deltaChange;
   rebalanceDeltaAction.transactionHash = event.transaction.hash.toHex();
 
+  const ethPrice = chainlinkAggregatorContract.latestAnswer()
+  rebalanceDeltaAction.ethPrice = ethPrice;
+
+
   rebalanceDeltaAction.save();
-
-  // const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
-
-  // const totalAssets = lpContract.getAssets();
-
-  // const dailyStatSnapshot = getDailySnapshot(timestamp)
-  // dailyStatSnapshot.totalAssets = dailyStatSnapshot.totalReturns.plus(totalAssets)
-  // dailyStatSnapshot.save()
 }
-
-// function getDailySnapshot(timestamp: BigInt): DailyStatSnapshot {
-
-//   let dayID = timestamp.toI32() / 86400
-//   let dayStartUnix = dayID * 86400
-//   let dayStartUnixBigInt = BigInt.fromI32(dayStartUnix)
-
-//   let dailyStatSnapshot = DailyStatSnapshot.load('last')
-
-//   const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL));
-
-//   if (dailyStatSnapshot === null) {
-//     dailyStatSnapshot = new DailyStatSnapshot('last')
-//     dailyStatSnapshot.totalReturns  = BIGINT_ZERO
-
-//     const totalAssets = lpContract.getAssets()
-//     dailyStatSnapshot.totalAssets  = totalAssets
-
-//     dailyStatSnapshot.cumulativeYield = BIGDECIMAL_ZERO
-//     dailyStatSnapshot.epoch  = BIGINT_ZERO
-//     dailyStatSnapshot.timestamp = dayStartUnixBigInt
-//   }
-
-//   if (dailyStatSnapshot !== null && dailyStatSnapshot.timestamp.notEqual(dayStartUnixBigInt) ) {
-//     const totalReturns = dailyStatSnapshot.totalReturns
-//     const totalAssets = dailyStatSnapshot.totalAssets
-//     const cumulativeYield = dailyStatSnapshot.cumulativeYield
-//     const epoch = dailyStatSnapshot.epoch
-
-//     dailyStatSnapshot.id = dailyStatSnapshot.timestamp.toString()
-//     dailyStatSnapshot.save()
-
-//     dailyStatSnapshot = new DailyStatSnapshot('last')
-//     dailyStatSnapshot.totalReturns  = totalReturns
-//     dailyStatSnapshot.totalAssets  = totalAssets
-//     dailyStatSnapshot.cumulativeYield  = cumulativeYield
-//     dailyStatSnapshot.epoch  = epoch
-//     dailyStatSnapshot.timestamp = dayStartUnixBigInt
-//   }
-
-//   return dailyStatSnapshot as DailyStatSnapshot
-
-// }

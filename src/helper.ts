@@ -1,14 +1,15 @@
-import { BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
+import { OptionsBought, OptionsSold } from "../generated/OptionExchange/OptionExchange";
+import { chainlinkAggregator } from '../generated/liquidityPool/chainlinkAggregator';
 import {
   Account,
   LongPosition,
-  ShortPosition,
-  Stat,
   OptionsBoughtAction,
-  OptionsSoldAction
+  OptionsSoldAction,
+  ShortPosition,
+  Stat
 } from "../generated/schema";
-import { OptionsBought, OptionsSold } from "../generated/OptionExchange/OptionExchange";
 
 export let BIGINT_ONE = BigInt.fromI32(1);
 export let BIGINT_ZERO = BigInt.fromI32(0);
@@ -390,6 +391,7 @@ export function updateLiquidatedPosition(
 export function addOptionsBoughtAction(
   event: OptionsBought,
 ): void {
+  const chainlinkAggregatorContract = chainlinkAggregator.bind(Address.fromString(CHAINLINK_AGGREGATOR))
 
   const txHash = event.transaction.hash.toHex();
 
@@ -414,6 +416,9 @@ export function addOptionsBoughtAction(
   optionsBoughtAction.fee = fee;
   optionsBoughtAction.timestamp = timestamp;
   optionsBoughtAction.transactionHash = txHash;
+
+  const ethPrice = chainlinkAggregatorContract.latestAnswer()
+  optionsBoughtAction.ethPrice = ethPrice;
 
   optionsBoughtAction.save();
 
@@ -443,6 +448,7 @@ export function addOptionsBoughtAction(
 export function addOptionsSoldAction(
   event: OptionsSold,
 ): void {
+  const chainlinkAggregatorContract = chainlinkAggregator.bind(Address.fromString(CHAINLINK_AGGREGATOR))
 
   const txHash = event.transaction.hash.toHex();
 
@@ -464,6 +470,9 @@ export function addOptionsSoldAction(
   optionsSoldAction.fee = event.params.fee;
   optionsSoldAction.timestamp = event.block.timestamp;
   optionsSoldAction.transactionHash = event.transaction.hash.toHex();
+
+  const ethPrice = chainlinkAggregatorContract.latestAnswer()
+  optionsSoldAction.ethPrice = ethPrice;
 
   optionsSoldAction.save();
 

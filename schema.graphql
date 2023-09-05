@@ -43,6 +43,7 @@ type OptionsBoughtAction @entity {
   buyer: Bytes!
   timestamp: BigInt!
   transactionHash: String!
+  ethPrice: BigInt!
 }
 
 type OptionsSoldAction @entity {
@@ -54,6 +55,7 @@ type OptionsSoldAction @entity {
   seller: Bytes!
   timestamp: BigInt!
   transactionHash: String!
+  ethPrice: BigInt!
 }
 
 type OptionsTransferAction @entity {
@@ -92,7 +94,7 @@ type RebalanceDeltaAction @entity {
   deltaChange: BigInt!
   timestamp: BigInt!
   transactionHash: String!
-  reactorIndex: Int
+  ethPrice: BigInt!
 }
 
 # type DailyStatSnapshot @entity {
