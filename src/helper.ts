@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
 
 import {
   Account,
@@ -35,7 +35,7 @@ export function isZeroAddress(value: Address): boolean {
   return value.toHex() == ZERO_ADDRESS;
 }
 
-export function updateOptionLongPosition(
+function updateOptionLongPosition(
   isBuy: boolean,
   trader: Address,
   oToken: string,

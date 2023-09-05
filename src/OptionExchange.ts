@@ -11,12 +11,6 @@ import {
 } from "../generated/schema";
 
 import {
-  updateStats,
-  CONTROLLER,
-  SHORT_OTOKEN_BURNED,
-  SHORT_OTOKEN_MINTED,
-  updateOptionLongPosition,
-  updateOptionShortPosition,
   addOptionsBoughtAction,
   addOptionsSoldAction
 } from "./helper";
