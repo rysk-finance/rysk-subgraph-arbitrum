@@ -24,6 +24,13 @@
       "inputs":[
          
       ],
+      "name":"CollateralAssetInvalid",
+      "type":"error"
+   },
+   {
+      "inputs":[
+         
+      ],
       "name":"InvalidBuyer",
       "type":"error"
    },
@@ -39,6 +46,13 @@
          
       ],
       "name":"InvalidPrice",
+      "type":"error"
+   },
+   {
+      "inputs":[
+         
+      ],
+      "name":"NonWhitelistedOtoken",
       "type":"error"
    },
    {
@@ -91,6 +105,32 @@
          }
       ],
       "name":"AuthorityUpdated",
+      "type":"event"
+   },
+   {
+      "anonymous":false,
+      "inputs":[
+         {
+            "indexed":false,
+            "internalType":"uint256",
+            "name":"feePerContract",
+            "type":"uint256"
+         }
+      ],
+      "name":"FeePerContractUpdated",
+      "type":"event"
+   },
+   {
+      "anonymous":false,
+      "inputs":[
+         {
+            "indexed":false,
+            "internalType":"address",
+            "name":"feeRecipient",
+            "type":"address"
+         }
+      ],
+      "name":"FeeRecipientUpdated",
       "type":"event"
    },
    {
@@ -711,6 +751,26 @@
          }
       ],
       "stateMutability":"view",
+      "type":"function"
+   },
+   {
+      "inputs":[
+         {
+            "internalType":"address",
+            "name":"optionExchange",
+            "type":"address"
+         },
+         {
+            "internalType":"address[]",
+            "name":"otokens",
+            "type":"address[]"
+         }
+      ],
+      "name":"transferOtokens",
+      "outputs":[
+         
+      ],
+      "stateMutability":"nonpayable",
       "type":"function"
    },
    {
