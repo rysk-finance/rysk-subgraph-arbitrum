@@ -69,6 +69,8 @@ dataSources:
       abis:
         - name: optionExchange
           file: ./abis/optionExchange.json
+        - name: chainlinkAggregator
+          file: ./abis/AggregatorV3__ABI.json
       eventHandlers:
         - event: OptionsBought(indexed address,indexed address,uint256,uint256,uint256)
           handler: handleOptionsBought
