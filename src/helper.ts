@@ -1,7 +1,7 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 import { OptionsBought, OptionsSold } from "../generated/OptionExchange/OptionExchange";
-import { chainlinkAggregator } from '../generated/liquidityPool/chainlinkAggregator';
+import { chainlinkAggregator } from '../generated/OptionExchange/chainlinkAggregator';
 import {
   Account,
   LongPosition,
