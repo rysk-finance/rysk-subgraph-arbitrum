@@ -10,7 +10,7 @@ import {
 } from "../generated/schema";
 import { OptionsBought, OptionsSold } from "../generated/OptionExchange/OptionExchange";
 
-import { chainlinkAggregator } from '../generated/liquidityPool/chainlinkAggregator'
+import { chainlinkAggregator } from '../generated/optionExchange/chainlinkAggregator'
 
 export let BIGINT_ONE = BigInt.fromI32(1);
 export let BIGINT_ZERO = BigInt.fromI32(0);
