@@ -18,8 +18,8 @@
   "optionExchange-start-block": 105499283,
   "optionHandler": "0xc63717c4436043781a63C8c64B02Ff774350e8F8",
   "optionHandler-start-block": 105499855,
-  "alphaPortfolioValuesFeed": "0x7f9d820CFc109686F2ca096fFA93dd497b91C073",
-  "alphaPortfolioValuesFeed-start-block": 105497295,
+  "alphaPortfolioValuesFeed": "0xc7AbaEc336098Cd0dcD98b67cb14d3B18e1c68A8",
+  "alphaPortfolioValuesFeed-start-block": 132185781,
   "oracle": "0xBA1880CFFE38DD13771CB03De896460baf7dA1E7",
   "oracle-start-block": 24287677
 }
