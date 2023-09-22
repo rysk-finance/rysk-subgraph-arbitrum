@@ -1,13 +1,12 @@
 specVersion: 0.0.4
 schema:
   file: ./schema.graphql
-# features:
-#   - grafting
-# graft:
-#  base: QmS4thuQDb5ndFecPrQWAAUoJkkjzjcWXugPBrRP7H2Cq8
-#  block: 106117601
+features:
+  - grafting
+graft:
+  base: Qma395BEndSYJqX84o652PsEg6xnDgDXebMJJh7sPcvZut
+  block: 39893000
 dataSources:
-
   - kind: ethereum
     name: liquidityPool
     network: {{network}}
