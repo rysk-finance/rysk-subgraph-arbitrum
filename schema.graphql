@@ -245,8 +245,9 @@ type OToken @entity {
 }
 
 type LongPosition @entity {
-  "Equals to <account>-<oToken>-l-<id>"
+  "Equals to <account>-<oToken>-l-<id>-<vaultId>"
   id: ID!
+  vaultId: BigInt
 
   "holder redeem actions (payout)"
   redeemActions: [RedeemAction!]!
@@ -269,7 +270,7 @@ type LongPosition @entity {
 }
 
 type ShortPosition @entity {
-  "Equals to <account>-<oToken>-s-<id>"
+  "Equals to <account>-<oToken>-s-<id>-<vaultId>"
   id: ID!
 
   account: Account!
