@@ -4,7 +4,7 @@ schema:
 features:
   - grafting
 graft:
-  base: Qma395BEndSYJqX84o652PsEg6xnDgDXebMJJh7sPcvZut
+  base: QmR5uLKowVBwxevukEKShfZCfDK7kQha3HNDg2Rm2oczcy
   block: 39893000
 dataSources:
   - kind: ethereum
