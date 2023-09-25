@@ -3,82 +3,54 @@
 ## Install
 
 ```shell
-npm i
+yarn -D
 ```
+
+## Prerequisites
+
+We use jq as part of the deployment process. To install it please follow instructions on the [jqlang website.](https://jqlang.github.io/jq/download/)
 
 ## Building the graph
 
-```shell
-# prepare arbitrum mainnet 
-npm run prepare:arbitrum
+There are two main commands required to build and deploy to Goldsky. Depending on the environment you wish to deploy, they will vary based on name. You will also need to create a `.env` file in the root which contains the following:
 
-# or prepare arbitrum goerli 
-npm run prepare:arbitrum-goerli
-
-# compile types
-npm run codegen
-
-# build subgraph
-npm run build
-
+```env
+GOLDSKY_TOKEN=<TOKEN>
 ```
 
-## Deploy
+You can obtain the token from a team member.
 
-### Get Access Token
+### Local
 
-You will need an access token for deployment. After you get that on [the graph](https://thegraph.com/explorer/dashboard), you need to run the following command before deploying.
+For a local deployment for testing, you can also make use of grafting. On lines 7 & 8 of the `subgraph.template.yaml` file, you can specify a base image and block number to graft from. It is recommended that you use the most recently deployed testnet base image. You can find this by visit that version and checking the logs on Goldsky. It will be shown as `subgraph_id: <image-id>`. Once these have been set you can run the following.
 
 ```shell
-graph auth https://api.thegraph.com/deploy/ <ACCESS_TOKEN>
+yarn build:local
+yarn deploy:local
 ```
 
-Make sure you include the last `/` at the end of the url!
+You will also find the overwrite command.
 
-### Deploy 
-
-run
 ```shell
-npm run deploy:arbitrum
+yarn deploy:local:overwrite
 ```
 
-In case you are deploying to _Goerli Testnet_ apply these changes to `helper.ts` beforehand:
+Using this will overwrite your development deployment which can be useful when debugging issues as otherwise, you will have to manually remove previous deployments from the Goldsky GUI.
 
-```txt
--export const LIQUIDITY_POOL = "0xc10b976c671ce9bff0723611f01422acbae100a5"
--export const OPTION_REGISTRY = "0x04706de6ce851a284b569ebae2e258225d952368"
-+export const LIQUIDITY_POOL = "0x2ceDe96cd46C9B751EeB868A57FEDeD060Dbe6Bf"
-+export const OPTION_REGISTRY = "0x48A74b742bd97545ace8B0876F5BA7ED19DF6579"
+### Goerli
+
+Grafting is automatically disabled for this environment.
+
+```shell
+yarn build:goerli
+yarn deploy:goerli
 ```
 
+### Mainnet
 
-### Local Forking
+Grafting is automatically disabled for this environment.
 
-In case you want to run a _graph-node_ locally, recommended to speed up development and debugging, and be able to fork the _Rysk_'s graph at any Arbitrum height you can follow these steps (more context here: [Subgraph Debug Forking](https://thegraph.com/docs/en/cookbook/subgraph-debug-forking/)) .
-
-This process can fork at specified heights (set in `config/arbitrum-local.json`), avoiding the problem of having wait times for the graph to sync up on each deploy.
-
-#### Instructions 
-First follow up to Step 5 included in the [graph-node docs](https://github.com/graphprotocol/graph-node#running-a-local-graph-node) using this repo as context for step 4 (make sure you have the prerequisites beforehand too).
-
-After, run this command within _graph-node_ (substitute username and password, in case of no password leave as `USERNAME:`)
-
-```bash
-cargo run -p graph-node --release -- \
-  --postgres-url postgresql://USERNAME[:PASSWORD]@localhost:5432/graph-node \
-  --ethereum-rpc arbitrum:https://rpc.ankr.com/arbitrum \
-  --ipfs 127.0.0.1:5001
-```
-
-And last let's setup the subgraph file, create the subraph and deploy it to our local _graph-node_.
-
-```
-prepare:arbitrum-local
-create:local
-deploy:local
-```
-
-You'll then finally see the _graph_node_ picking up on contract event and syncing; when done you'll have access to all indexed data locally: 
-```
-http://127.0.0.1:8000/subgraphs/name/rysk-local/graphql
+```shell
+yarn build:arbitrum
+yarn deploy:arbitrum
 ```
