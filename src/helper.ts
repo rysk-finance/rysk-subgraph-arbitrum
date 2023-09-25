@@ -17,7 +17,7 @@ export const OPTION_EXCHANGE = '0xb672fe86693bf6f3b034730f5d2c77c8844d6b45'
 export const OPTION_EXCHANGE_OLD = '0x63ce41ca4e30e75caf9b561e0250c25056b6e2c0'
 export const OPTION_REGISTRY = '0x4e89cc3215af050ceb63ca62470eec7c1a66f737'
 export const CONTROLLER = '0x11a602a5f5d823c103bb8b7184e22391aae5f4c2'
-export const MARGIN_POOL = '0x0e0ad3ea82efaeafb4476f5e8225b4746b88fd9f' // FIXME: Remember main net.
+export const MARGIN_POOL = '0x0e0ad3ea82efaeafb4476f5e8225b4746b88fd9f'
 
 export const WETH_ADDRESS = '0x3b3a1de07439eeb04492fa64a889ee25a130cdd3'
 export const USDC_ADDRESS = '0x408c5755b5c7a0a28d851558ea3636cfc5b5b19d'
