@@ -238,8 +238,11 @@ export function updateSellerPosition(
   }
   position.netAmount = position.netAmount.minus(amount)
   position.buyAmount = position.buyAmount.minus(amount)
-  // set position to inactive (closed) whenever we get back to zero longs and shorts
-  if (position.netAmount.isZero()) position.active = false
+
+  // If the position reaches net zero:
+  // - and has a default vaultId, it is a closed naked long so we mark it as inactive.
+  // - and has a vaultId, it is being transferred to a vault as collateral so we keep it active.
+  if (position.netAmount.isZero() && vaultId == DEFAULT_VAULT_ID) position.active = false
 
   let transactions = position.optionsTransferTransactions
   transactions.push(tradeId)
