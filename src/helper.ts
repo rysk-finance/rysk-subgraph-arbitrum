@@ -27,6 +27,8 @@ export const SHORT_OTOKEN_MINTED = '0x4d7f96086c92b2f9a254ad21548b1c1f2d99502c79
 const COLLATERAL_ASSET_DEPOSITED = '0xbfab88b861f171b7db714f00e5966131253918d55ddba816c3eb94657d102390'
 const COLLATERAL_ASSET_WITHDRAWN = '0xfe86f7694b6c54a528acbe27be61dd4a85e9a89aeef7f650a1b439045ccee5a4'
 
+export const DEFAULT_VAULT_ID = '0'
+
 export function isZeroAddress(value: Address): boolean {
   return value.toHex() == ZERO_ADDRESS
 }
@@ -179,7 +181,7 @@ export function loadLongPosition(
   user: Address,
   oToken: string,
   numId: BigInt,
-  vaultId: string = '0',
+  vaultId: string = DEFAULT_VAULT_ID,
 ): LongPosition | null {
   let id = user.toHex() + '-' + oToken + '-l-' + numId.toString() + '-' + vaultId
   let position = LongPosition.load(id)
@@ -375,7 +377,7 @@ export function updateLiquidatedPosition(
 
 export function getVaultIdFromLogs(account: Address, txLogs: ethereum.Log[]): string {
   // Check TX logs to find the presence of a vault ID or default to zero.
-  let vaultId = '0'
+  let vaultId = DEFAULT_VAULT_ID
   const logsLength = txLogs.length
 
   for (let index = 0; index < logsLength; index++) {
