@@ -236,13 +236,17 @@ export function updateSellerPosition(
     initPositionId = initPositionId.plus(BIGINT_ONE)
     position = loadOrCreateLongPosition(seller, oToken, initPositionId, vaultId)
   }
-  position.netAmount = position.netAmount.minus(amount)
-  position.buyAmount = position.buyAmount.minus(amount)
 
-  // If the position reaches net zero:
-  // - and has a default vaultId, it is a closed naked long so we mark it as inactive.
-  // - and has a vaultId, it is being transferred to a vault as collateral so we keep it active.
-  if (position.netAmount.isZero() && vaultId == DEFAULT_VAULT_ID) position.active = false
+  // If the position is part of a naked long.
+  if (vaultId == DEFAULT_VAULT_ID) {
+    position.netAmount = position.netAmount.minus(amount)
+    position.buyAmount = position.buyAmount.minus(amount)
+
+    // If the position reaches net zero, it is user transferred so we mark it as inactive.
+    if (position.netAmount.isZero()) position.active = false
+  }
+
+  // If the position has a vaultId, it is being transferred to a vault as collateral so we keep it unchanged.
 
   let transactions = position.optionsTransferTransactions
   transactions.push(tradeId)
