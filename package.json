@@ -1,6 +1,6 @@
 {
   "name": "rysk-subgraph",
-  "version": "1.3.2",
+  "version": "1.3.4",
   "license": "UNLICENSED",
   "scripts": {
     "prepare:local": "mustache config/arbitrum-local.json subgraph.template.yaml > subgraph.yaml",

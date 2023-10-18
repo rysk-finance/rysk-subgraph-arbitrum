@@ -24,6 +24,9 @@ export const USDC_ADDRESS = '0x408c5755b5c7a0a28d851558ea3636cfc5b5b19d'
 
 export const SHORT_OTOKEN_BURNED = '0xdd96b18f26fd9950581b9fd821fa907fc318845fc4d220b825a7b19bfdd174e8'
 export const SHORT_OTOKEN_MINTED = '0x4d7f96086c92b2f9a254ad21548b1c1f2d99502c7949508866349b96bb1a8d8a'
+
+const COLLATERAL_ASSET_DEPOSITED = '0xbfab88b861f171b7db714f00e5966131253918d55ddba816c3eb94657d102390'
+const COLLATERAL_ASSET_WITHDRAWN = '0xfe86f7694b6c54a528acbe27be61dd4a85e9a89aeef7f650a1b439045ccee5a4'
 const LONG_OTOKEN_DEPOSITED = '0x2607e210004cef0ad6b3e6aedb778bffb03c1586f8dcf55d49afffde210d8bb1'
 const LONG_OTOKEN_WITHDRAWN = '0xbd023c53d293da163d185720d4274f4ddabc09d5304491a55abb296cc811d9fa'
 
@@ -391,7 +394,12 @@ export function getVaultIdFromLogs(account: Address, txLogs: ethereum.Log[]): st
     if (txLogs[index].address.toHexString() == CONTROLLER) {
       const topicZero = txLogs[index].topics[0].toHexString()
 
-      if (topicZero == LONG_OTOKEN_DEPOSITED || topicZero == LONG_OTOKEN_WITHDRAWN) {
+      if (
+        topicZero == COLLATERAL_ASSET_DEPOSITED ||
+        topicZero == COLLATERAL_ASSET_WITHDRAWN ||
+        topicZero == LONG_OTOKEN_DEPOSITED ||
+        topicZero == LONG_OTOKEN_WITHDRAWN
+      ) {
         const topicAddress = txLogs[index].topics[2]
           .toHexString()
           .split('000000000000000000000000')
