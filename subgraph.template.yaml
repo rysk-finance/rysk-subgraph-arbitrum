@@ -384,6 +384,29 @@ dataSources:
           handler: handlePricerUpdated
       file: ./src/Oracle.ts
 
+  - kind: ethereum
+    name: ARB
+    network: {{network}}
+    source:
+      abi: ERC20
+      address: "{{ARB}}"
+      startBlock: {{ARB-start-block}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - ARBTreasuryAirdrop
+      abis:
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: chainlinkAggregator
+          file: ./abis/AggregatorV3__ABI.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/ERC20.ts
+
 templates:
   - name: OToken
     kind: ethereum
@@ -400,8 +423,6 @@ templates:
         - name: OToken
           file: ./abis/OToken.json
       eventHandlers:
-        # - event: Approval(indexed address,indexed address,uint256)
-        #   handler: handleApproval
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
       file: ./src/OToken.ts
