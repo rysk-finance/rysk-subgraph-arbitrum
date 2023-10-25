@@ -3,7 +3,7 @@ import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts'
 import { OptionsBought, OptionsSold } from '../generated/OptionExchange/OptionExchange'
 import { chainlinkAggregator } from '../generated/OptionExchange/chainlinkAggregator'
 import { Account, LongPosition, OptionsBoughtAction, OptionsSoldAction, ShortPosition, Stat } from '../generated/schema'
-import { CHAINLINK_AGGREGATOR, CONTROLLER } from './addresses'
+import { CHAINLINK_AGGREGATOR_ETH_USD, CONTROLLER } from './addresses'
 import { BIGINT_ONE, BIGINT_ZERO, DEFAULT_VAULT_ID, ZERO_ADDRESS } from './constants'
 
 export const SHORT_OTOKEN_BURNED = '0xdd96b18f26fd9950581b9fd821fa907fc318845fc4d220b825a7b19bfdd174e8'
@@ -437,7 +437,7 @@ export function getCollateralDepositedFromLogs(account: Address, txLogs: ethereu
 }
 
 export function addOptionsBoughtAction(event: OptionsBought): void {
-  const chainlinkAggregatorContract = chainlinkAggregator.bind(Address.fromString(CHAINLINK_AGGREGATOR))
+  const chainlinkAggregatorContract = chainlinkAggregator.bind(Address.fromString(CHAINLINK_AGGREGATOR_ETH_USD))
 
   const txHash = event.transaction.hash.toHex()
 
@@ -494,7 +494,7 @@ export function addOptionsBoughtAction(event: OptionsBought): void {
 }
 
 export function addOptionsSoldAction(event: OptionsSold): void {
-  const chainlinkAggregatorContract = chainlinkAggregator.bind(Address.fromString(CHAINLINK_AGGREGATOR))
+  const chainlinkAggregatorContract = chainlinkAggregator.bind(Address.fromString(CHAINLINK_AGGREGATOR_ETH_USD))
 
   const txHash = event.transaction.hash.toHex()
 
