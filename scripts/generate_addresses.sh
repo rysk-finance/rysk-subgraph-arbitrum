@@ -30,6 +30,8 @@ config=$(
     --arg address_book_block $ADDRESS_BOOK_BLOCK \
     --arg alpha_porfolio_values_feed $ALPHA_PORTFOLIO_VALUES_FEED \
     --arg alpha_porfolio_values_feed_block $ALPHA_PORTFOLIO_VALUES_FEED_BLOCK \
+    --arg arb $ARB \
+    --arg arb_block $ARB_BLOCK \
     --arg controller $CONTROLLER \
     --arg controller_block $CONTROLLER_BLOCK \
     --arg liquidity_pool $LIQUIDITY_POOL \
@@ -54,6 +56,8 @@ config=$(
       "alphaPortfolioValuesFeed-start-block": $alpha_porfolio_values_feed_block|tonumber,
       "addressBook": $address_book,
       "addressBook-start-block": $address_book_block|tonumber,
+      "ARB": $arb,
+      "ARB-start-block": $arb_block|tonumber,
       "controller": $controller,
       "controller-start-block": $controller_block|tonumber,
       "liquidityPool": $liquidity_pool,
