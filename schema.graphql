@@ -115,6 +115,7 @@ type PricePerShare @entity {
   timestamp: BigInt!
   value: BigInt!
   growthSinceFirstEpoch: BigDecimal!
+  arbPrice: BigInt!
   ethPrice: BigInt!
 }
 
