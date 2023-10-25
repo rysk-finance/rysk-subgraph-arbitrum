@@ -179,9 +179,15 @@ export function handleWithdrawalEpochExecuted(event: WithdrawalEpochExecuted): v
     .times(BigDecimal.fromString('100'))
   pricePerShare.value = currentPricePerShare
 
-  const arbPrice = chainlinkAggregatorContractARB.latestAnswer()
+  const arbPrice = chainlinkAggregatorContractARB.try_latestAnswer()
+  
+  if (!arbPrice.reverted) {
+    pricePerShare.arbPrice = arbPrice.value
+  } else {
+    pricePerShare.arbPrice = BigInt.fromI32(0)
+  }
+
   const ethPrice = chainlinkAggregatorContractETH.latestAnswer()
-  pricePerShare.arbPrice = arbPrice
   pricePerShare.ethPrice = ethPrice
 
   pricePerShare.save()
