@@ -93,6 +93,7 @@ echo 'export const OPTION_EXCHANGE_OLD = "'$(to_lowercase $OPTION_EXCHANGE_OLD)'
 echo 'export const OPTION_REGISTRY = "'$(to_lowercase $OPTION_REGISTRY)'"' >> $addresses_file
 echo 'export const CONTROLLER = "'$(to_lowercase $CONTROLLER)'"' >> $addresses_file
 echo 'export const MARGIN_POOL = "'$(to_lowercase $MARGIN_POOL)'"' >> $addresses_file
+echo 'export const TREASURY = "'$(to_lowercase $TREASURY)'"' >> $addresses_file
 
 echo >> $addresses_file
 echo '// Currency addresses.' >> $addresses_file
