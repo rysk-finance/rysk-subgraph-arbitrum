@@ -401,8 +401,14 @@ export function handleVaultSettled(event: VaultSettled): void {
     const ryskAmount = assert(action.shortAmount, "shortAmount can't be null").times(BigInt.fromString('10000000000'))
 
     let amountForRedeem = BigInt.fromString('0')
+    let collateralAmount = action.collateralAmount
 
-    const collateralInVault = assert(action.collateralAmount, "collateral can't be null")
+    if (!collateralAmount && action.long) {
+      // Is part of a debit spread.
+      collateralAmount = BIGINT_ZERO
+    }
+
+    const collateralInVault = assert(collateralAmount, "collateral can't be null")
     const payoutFromVault = assert(action.amount, "Payout can't be null")
 
     // USDC or WETH cost of settle
