@@ -399,14 +399,12 @@ export function handleVaultSettled(event: VaultSettled): void {
     vault.save()
 
     const ryskAmount = assert(action.shortAmount, "shortAmount can't be null").times(BigInt.fromString('10000000000'))
+    const isDebitSpread = !action.collateralAmount && !!action.long
 
     let amountForRedeem = BigInt.fromString('0')
     let collateralAmount = action.collateralAmount
 
-    if (!collateralAmount && action.long) {
-      // Is part of a debit spread.
-      collateralAmount = BIGINT_ZERO
-    }
+    if (isDebitSpread) collateralAmount = BIGINT_ZERO
 
     const collateralInVault = assert(collateralAmount, "collateral can't be null")
     const payoutFromVault = assert(action.amount, "Payout can't be null")
@@ -430,6 +428,8 @@ export function handleVaultSettled(event: VaultSettled): void {
         }
       }
     }
+
+    if (isDebitSpread) amountForRedeem = loss
 
     updateSettlerPosition(
       event.params.accountOwner, // settler not .to because .to is the address that receives the payout
