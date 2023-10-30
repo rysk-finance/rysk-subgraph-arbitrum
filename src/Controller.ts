@@ -38,9 +38,8 @@ import {
   OToken,
 } from '../generated/schema'
 
+import { BIGINT_ONE, BIGINT_ZERO } from './constants'
 import {
-  BIGINT_ONE,
-  BIGINT_ZERO,
   loadOrCreateAccount,
   loadOrCreateShortPosition,
   OPTION_EXCHANGE,

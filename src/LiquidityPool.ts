@@ -24,7 +24,8 @@ import {
   WriteOptionsAction,
   PricePerShare
 } from "../generated/schema";
-import { BIGINT_ZERO, LIQUIDITY_POOL, CHAINLINK_AGGREGATOR } from "./helper";
+import { BIGINT_ZERO } from './constants'
+import { LIQUIDITY_POOL, CHAINLINK_AGGREGATOR } from "./helper";
 
 export function handleDeposit(event: Deposit): void {
   const depositAction = new DepositAction(event.transaction.hash.toHex());

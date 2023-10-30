@@ -1,10 +1,9 @@
 import { Transfer } from '../generated/templates/OToken/OToken'
 
 import { OToken, AccountBalance, OptionsTransferAction } from '../generated/schema'
-import { Address, BigInt, log } from '@graphprotocol/graph-ts'
+import { Address, BigInt } from '@graphprotocol/graph-ts'
+import { BIGINT_ZERO, BIGINT_ONE, ZERO_ADDRESS } from './constants'
 import {
-  BIGINT_ZERO,
-  BIGINT_ONE,
   getVaultIdFromLogs,
   LIQUIDITY_POOL,
   LIQUIDITY_POOL_OLD,
@@ -14,7 +13,6 @@ import {
   OPTION_REGISTRY,
   updateBuyerPosition,
   updateSellerPosition,
-  ZERO_ADDRESS,
   MARGIN_POOL,
   loadLongPosition,
 } from './helper'

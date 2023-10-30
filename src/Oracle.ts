@@ -18,7 +18,7 @@ import {
 
 import { checkERC20Entity } from "./Whitelist";
 
-import { ZERO_ADDRESS, BIGINT_ZERO } from "./helper";
+import { ZERO_ADDRESS, BIGINT_ZERO } from "./constants";
 
 export function handleDisputerUpdated(event: DisputerUpdated): void {
   let oracle = Oracle.load("1");

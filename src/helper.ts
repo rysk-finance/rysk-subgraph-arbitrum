@@ -1,15 +1,10 @@
-import { Address, BigDecimal, BigInt, ethereum } from '@graphprotocol/graph-ts'
+import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts'
 
 import { OptionsBought, OptionsSold } from '../generated/OptionExchange/OptionExchange'
 import { chainlinkAggregator } from '../generated/OptionExchange/chainlinkAggregator'
 import { Account, LongPosition, OptionsBoughtAction, OptionsSoldAction, ShortPosition, Stat } from '../generated/schema'
+import { BIGINT_ONE, BIGINT_ZERO, DEFAULT_VAULT_ID, ZERO_ADDRESS } from './constants'
 
-export let BIGINT_ONE = BigInt.fromI32(1)
-export let BIGINT_ZERO = BigInt.fromI32(0)
-export let BIGDECIMAL_ZERO = BigDecimal.fromString('0')
-export let BIGDECIMAL_ONE = BigDecimal.fromString('1')
-
-export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 export const LIQUIDITY_POOL = '0x0b1bf5fb77aa36cd48baa1395bc2b5fa0f135d8c'
 export const CHAINLINK_AGGREGATOR = '0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08'
 export const LIQUIDITY_POOL_OLD = '0xc10b976c671ce9bff0723611f01422acbae100a5'
@@ -29,8 +24,6 @@ const COLLATERAL_ASSET_DEPOSITED = '0xbfab88b861f171b7db714f00e5966131253918d55d
 const COLLATERAL_ASSET_WITHDRAWN = '0xfe86f7694b6c54a528acbe27be61dd4a85e9a89aeef7f650a1b439045ccee5a4'
 const LONG_OTOKEN_DEPOSITED = '0x2607e210004cef0ad6b3e6aedb778bffb03c1586f8dcf55d49afffde210d8bb1'
 const LONG_OTOKEN_WITHDRAWN = '0xbd023c53d293da163d185720d4274f4ddabc09d5304491a55abb296cc811d9fa'
-
-export const DEFAULT_VAULT_ID = '0'
 
 export function isZeroAddress(value: Address): boolean {
   return value.toHex() == ZERO_ADDRESS
