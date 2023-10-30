@@ -51,11 +51,11 @@ dataSources:
       file: ./src/LiquidityPool.ts
 
   - kind: ethereum
-    name: optionExchange
+    name: OptionExchange
     network: {{network}}
     source:
       address: "{{optionExchange}}"
-      abi: optionExchange
+      abi: OptionExchange
       startBlock: {{optionExchange-start-block}}
     mapping:
       kind: ethereum/events
@@ -66,8 +66,8 @@ dataSources:
         - OptionsSold
         - Collateral
       abis:
-        - name: optionExchange
-          file: ./abis/optionExchange.json
+        - name: OptionExchange
+          file: ./abis/OptionExchange.json
         - name: chainlinkAggregator
           file: ./abis/AggregatorV3__ABI.json
       eventHandlers:
@@ -79,14 +79,14 @@ dataSources:
           receipt: true
         - event: CollateralApprovalChanged(indexed address,bool,bool)
           handler: handleCollateralApprovalChanged
-      file: ./src/optionExchange.ts
+      file: ./src/OptionExchange.ts
 
   - kind: ethereum
-    name: optionHandler
+    name: OptionHandler
     network: {{network}}
     source:
       address: "{{optionHandler}}"
-      abi: optionHandler
+      abi: OptionHandler
       startBlock: {{optionHandler-start-block}}
     mapping:
       kind: ethereum/events
@@ -96,8 +96,8 @@ dataSources:
         - OptionsBought
         - OptionsSold
       abis:
-        - name: optionHandler
-          file: ./abis/optionHandler.json
+        - name: OptionHandler
+          file: ./abis/OptionHandler.json
         - name: chainlinkAggregator
           file: ./abis/AggregatorV3__ABI.json
       eventHandlers:
@@ -105,7 +105,7 @@ dataSources:
           handler: handleOptionsBought
         - event: OptionsSold(indexed address,indexed address,uint256,uint256,uint256)
           handler: handleOptionsSold
-      file: ./src/optionHandler.ts
+      file: ./src/OptionHandler.ts
 
   - kind: ethereum
     name: OTokenFactory
