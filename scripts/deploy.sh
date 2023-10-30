@@ -1,8 +1,13 @@
 #!/bin/bash
 
-set -a
-source .env
-set +a
+env=.env
+
+# Get environment variables.
+if [[ -f $env ]]; then
+  set -a
+  source $env
+  set +a
+fi
 
 GOLDSKY_TOKEN=$(printenv GOLDSKY_TOKEN)
 

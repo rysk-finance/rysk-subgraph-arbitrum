@@ -12,17 +12,20 @@ remove_if_exists () {
 }
 
 # Set file paths.
-config_file=config.json
 addresses_file=src/addresses.ts
+config_file=config.json
+env=.env
 
 # Remove files if they exist.
 remove_if_exists $config_file
 remove_if_exists $addresses_file
 
 # Get environment variables.
-set -a
-source .env
-set +a
+if [[ -f $env ]]; then
+  set -a
+  source $env
+  set +a
+fi
 
 # Network.
 network=$(printenv NETWORK)
