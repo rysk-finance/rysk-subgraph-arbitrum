@@ -4,6 +4,7 @@ generated
 
 # auto-generated
 subgraph.yaml
+config.json
 
 # yarn
 yarn-error.log
