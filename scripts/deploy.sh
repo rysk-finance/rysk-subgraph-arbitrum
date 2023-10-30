@@ -21,4 +21,8 @@ goldsky \
   $flags \
   --token $GOLDSKY_TOKEN
 
+if [[ $(printenv CI) == 'true' ]]; then
+  exit 0
+fi
+
 read -p "Press any key to continue..." x
