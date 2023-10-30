@@ -1,20 +1,22 @@
-import { Transfer } from '../generated/templates/OToken/OToken'
-
-import { OToken, AccountBalance, OptionsTransferAction } from '../generated/schema'
 import { Address, BigInt } from '@graphprotocol/graph-ts'
-import { BIGINT_ZERO, BIGINT_ONE, ZERO_ADDRESS } from './constants'
+
+import { AccountBalance, OToken, OptionsTransferAction } from '../generated/schema'
+import { Transfer } from '../generated/templates/OToken/OToken'
 import {
-  getVaultIdFromLogs,
   LIQUIDITY_POOL,
   LIQUIDITY_POOL_OLD,
-  loadOrCreateAccount,
+  MARGIN_POOL,
   OPTION_EXCHANGE,
   OPTION_EXCHANGE_OLD,
   OPTION_REGISTRY,
+} from './addresses'
+import { BIGINT_ONE, BIGINT_ZERO, ZERO_ADDRESS } from './constants'
+import {
+  getVaultIdFromLogs,
+  loadLongPosition,
+  loadOrCreateAccount,
   updateBuyerPosition,
   updateSellerPosition,
-  MARGIN_POOL,
-  loadLongPosition,
 } from './helper'
 
 export function handleTransfer(event: Transfer): void {

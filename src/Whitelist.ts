@@ -13,7 +13,7 @@ import {
 import { ERC20 as ERC20Contract } from "../generated/OTokenFactory/ERC20";
 import { ERC20, WhitelistedProduct } from "../generated/schema";
 import { log } from "@graphprotocol/graph-ts";
-import { USDC_ADDRESS, WETH_ADDRESS } from "./helper";
+import { USDC_ADDRESS, WETH_ADDRESS } from "./addresses";
 
 // const blacklistedPaymentTokens = ['0xb7a4f3e9097c08da09517b5ab877f7a917224ede']
 

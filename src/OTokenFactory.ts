@@ -2,7 +2,7 @@ import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { OtokenCreated } from "../generated/OTokenFactory/OTokenFactory";
 import { OToken as OTokenSource } from "../generated/templates";
 import { OToken } from "../generated/schema";
-import { WETH_ADDRESS } from "./helper";
+import { WETH_ADDRESS } from "./addresses";
 
 export function handleOtokenCreated(event: OtokenCreated): void {
   // Start indexing the newly created OToken contract

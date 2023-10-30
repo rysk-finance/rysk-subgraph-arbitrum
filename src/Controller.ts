@@ -1,4 +1,5 @@
 import { BigInt, store } from '@graphprotocol/graph-ts'
+
 import {
   CollateralAssetDeposited,
   CollateralAssetWithdrawed,
@@ -37,17 +38,14 @@ import {
   ExpiryPrice,
   OToken,
 } from '../generated/schema'
-
+import { OPTION_EXCHANGE, USDC_ADDRESS, WETH_ADDRESS } from './addresses'
 import { BIGINT_ONE, BIGINT_ZERO } from './constants'
 import {
   loadOrCreateAccount,
   loadOrCreateShortPosition,
-  OPTION_EXCHANGE,
   updateLiquidatedPosition,
   updateRedeemerPosition,
   updateSettlerPosition,
-  USDC_ADDRESS,
-  WETH_ADDRESS,
 } from './helper'
 
 function loadOrCreateOperator(operatorId: string): Operator {
