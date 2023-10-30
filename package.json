@@ -8,7 +8,7 @@
     "deploy:local": "scripts/deploy.sh arbitrum-local",
     "deploy:local:overwrite": "scripts/deploy.sh arbitrum-local --overwrite",
     "deploy:goerli": "scripts/deploy.sh arbitrum-goerli --remove-graft",
-    "deploy:arbitrum": "scripts/deploy.sh arbitrum-one --remove-graft",
+    "deploy:one": "scripts/deploy.sh arbitrum-one --remove-graft",
     "test": "graph test"
   },
   "dependencies": {
