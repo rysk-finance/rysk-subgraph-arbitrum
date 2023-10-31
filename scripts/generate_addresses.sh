@@ -5,20 +5,14 @@ to_lowercase() {
   echo $1 | tr '[:upper:]' '[:lower:]'
 }
 
-remove_if_exists () {
-  if [ -f $1 ]; then
-    rm $1
-  fi
-}
-
 # Set file paths.
 addresses_file=src/addresses.ts
 config_file=config.json
 env=.env
 
 # Remove files if they exist.
-remove_if_exists $config_file
-remove_if_exists $addresses_file
+rm -f $config_file
+rm -f $addresses_file
 
 # Get environment variables.
 if [[ -f $env ]]; then
