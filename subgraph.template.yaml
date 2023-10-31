@@ -205,7 +205,7 @@ dataSources:
           handler: handleSystemPartiallyPaused
       file: ./src/Controller.ts
 
-  - kind: ethereum/contract
+  - kind: ethereum
     name: Whitelist
     network: {{network}}
     source:
@@ -252,7 +252,7 @@ dataSources:
           handler: handleProductWhitelisted
       file: ./src/Whitelist.ts
 
-  - kind: ethereum/contract
+  - kind: ethereum
     name: AddressBook
     network: {{network}}
     source:
@@ -277,7 +277,7 @@ dataSources:
           handler: handleProxyCreated
       file: ./src/AddressBook.ts
 
-  - kind: ethereum/contract
+  - kind: ethereum
     name: OptionCatalogue
     network: {{network}}
     source:
@@ -301,7 +301,7 @@ dataSources:
           handler: handleSeriesAltered
       file: ./src/OptionCatalogue.ts
 
-  - kind: ethereum/contract
+  - kind: ethereum
     name: VolatilityFeed
     network: {{network}}
     source:
@@ -322,7 +322,7 @@ dataSources:
           handler: handleSabrParamsSet
       file: ./src/VolatilityFeed.ts
 
-  - kind: ethereum/contract
+  - kind: ethereum
     name: AlphaPortfolioValuesFeed
     network: {{network}}
     source:
@@ -343,7 +343,7 @@ dataSources:
           handler: handleStoresUpdated
       file: ./src/AlphaPortfolioValuesFeed.ts
 
-  - kind: ethereum/contract
+  - kind: ethereum
     name: Oracle
     network: {{network}}
     source:

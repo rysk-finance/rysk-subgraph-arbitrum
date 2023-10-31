@@ -405,6 +405,39 @@ export function getVaultIdFromLogs(account: Address, txLogs: ethereum.Log[]): st
   return vaultId
 }
 
+export function getCollateralDepositedFromLogs(account: Address, txLogs: ethereum.Log[]): string {
+  // Check TX logs to find the presence of a collateral deposited to check open sell or default to zero collateral
+  let collateralAmount = '0'
+  const logsLength = txLogs.length
+
+  for (let index = 0; index < logsLength; index++) {
+    if (txLogs[index].address.toHexString() == CONTROLLER) {
+      const topicZero = txLogs[index].topics[0].toHexString()
+
+      if (topicZero == COLLATERAL_ASSET_DEPOSITED) {
+        const topicAddress = txLogs[index].topics[2]
+          .toHexString()
+          .split('000000000000000000000000')
+          .join('')
+
+        if (topicAddress == account.toHexString()) {
+          const decodedAmount = ethereum.decode('(uint256,unit256)', txLogs[index].data)
+
+          if (decodedAmount) {
+            collateralAmount = decodedAmount
+              .toTuple()[1]
+              .toBigInt()
+              .toString()
+            break
+          }
+        }
+      }
+    }
+  }
+
+  return collateralAmount
+}
+
 export function addOptionsBoughtAction(event: OptionsBought): void {
   const chainlinkAggregatorContract = chainlinkAggregator.bind(Address.fromString(CHAINLINK_AGGREGATOR))
 
@@ -489,6 +522,11 @@ export function addOptionsSoldAction(event: OptionsSold): void {
   const ethPrice = chainlinkAggregatorContract.latestAnswer()
   optionsSoldAction.ethPrice = ethPrice
 
+  const collateralAmount = getCollateralDepositedFromLogs(seller, txLogs)
+
+  optionsSoldAction.isOpen = collateralAmount !== '0'
+  optionsSoldAction.collateralAmount = BigInt.fromString(collateralAmount)
+
   optionsSoldAction.save()
 
   const total = event.params.premium.minus(event.params.fee)
@@ -507,6 +545,7 @@ export function addOptionsSoldAction(event: OptionsSold): void {
         txLogs[i].topics[2].toHexString().slice(26) == event.transaction.from.toHexString().slice(2)
       ) {
         // if topic is shortOtokenMinted and account owner is tx sender (trader)
+
         updateOptionShortPosition(false, seller, otoken, amount, id, total, vaultId)
         return
       }
