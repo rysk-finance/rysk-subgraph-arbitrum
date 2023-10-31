@@ -5,6 +5,7 @@ generated
 # auto-generated
 subgraph.yaml
 config.json
+src/addresses.ts
 
 # yarn
 yarn-error.log
