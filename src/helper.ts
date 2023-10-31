@@ -405,9 +405,9 @@ export function getVaultIdFromLogs(account: Address, txLogs: ethereum.Log[]): st
   return vaultId
 }
 
-export function getCollateralDepositedFromLogs(account: Address, txLogs: ethereum.Log[]): string {
+export function getCollateralDepositedFromLogs(account: Address, txLogs: ethereum.Log[]): BigInt {
   // Check TX logs to find the presence of a collateral deposited to check open sell or default to zero collateral
-  let collateralAmount = '0'
+  let collateralAmount = BIGINT_ZERO
   const logsLength = txLogs.length
 
   for (let index = 0; index < logsLength; index++) {
@@ -424,10 +424,8 @@ export function getCollateralDepositedFromLogs(account: Address, txLogs: ethereu
           const decodedAmount = ethereum.decode('(uint256,unit256)', txLogs[index].data)
 
           if (decodedAmount) {
-            collateralAmount = decodedAmount
-              .toTuple()[1]
-              .toBigInt()
-              .toString()
+            collateralAmount = decodedAmount.toTuple()[1].toBigInt()
+
             break
           }
         }
@@ -524,8 +522,8 @@ export function addOptionsSoldAction(event: OptionsSold): void {
 
   const collateralAmount = getCollateralDepositedFromLogs(seller, txLogs)
 
-  optionsSoldAction.isOpen = collateralAmount !== '0'
-  optionsSoldAction.collateralAmount = BigInt.fromString(collateralAmount)
+  optionsSoldAction.isOpen = !collateralAmount.isZero()
+  optionsSoldAction.collateralAmount = collateralAmount
 
   optionsSoldAction.save()
 
