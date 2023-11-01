@@ -59,7 +59,7 @@ jobs:
         run: yarn -D
 
       - name: Build
-        run: yarn build
+        run: yarn build:ci
 
       - name: Deploy
         run: yarn deploy:one
