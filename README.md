@@ -65,7 +65,7 @@ There are two main commands required to build and deploy to Goldsky. Depending o
 For a local deployment for testing, you can also make use of grafting. On lines 7 & 8 of the `subgraph.template.yaml` file, you can specify a base image and block number to graft from. It is recommended that you use the most recently deployed testnet base image. You can find this by visit that version and checking the logs on Goldsky. It will be shown as `subgraph_id: <image-id>`. Once these have been set you can run the following.
 
 ```shell
-yarn build:local
+yarn build
 yarn deploy:local
 ```
 
@@ -82,7 +82,7 @@ Using this will overwrite your development deployment which can be useful when d
 Grafting is automatically disabled for this environment.
 
 ```shell
-yarn build:goerli
+yarn build
 yarn deploy:goerli
 ```
 
@@ -91,6 +91,6 @@ yarn deploy:goerli
 Grafting is automatically disabled for this environment.
 
 ```shell
-yarn build:arbitrum
-yarn deploy:arbitrum
+yarn build
+yarn deploy:one
 ```
