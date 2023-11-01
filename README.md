@@ -14,6 +14,7 @@ To get started you will need to create a `.env` file in the root which contains 
 
 ```env
 GOLDSKY_TOKEN=<TOKEN>
+THE_GRAPH_TOKEN=<TOKEN>
 
 NETWORK=arbitrum-goerli
 
@@ -50,7 +51,7 @@ USDC=0x408c5755b5c7a0a28d851558ea3636cfc5b5b19d
 WETH=0x3b3a1de07439eeb04492fa64a889ee25a130cdd3
 ```
 
-You can obtain the `GOLDSKY_TOKEN` from a team member. The remaining variables will be sufficient for deploying a local subgraph for Goerli. In the event that you need to deploy a main net subgraph, you will need to swap out the variables accordingly.
+You can obtain the `GOLDSKY_TOKEN` and the `THE_GRAPH_TOKEN` from a team member. The remaining variables will be sufficient for deploying a local subgraph for Goerli. In the event that you need to deploy a main net subgraph, you will need to swap out the variables accordingly.
 
 ## Prerequisites
 
@@ -58,14 +59,21 @@ We use jq as part of the deployment process. To install it please follow instruc
 
 ## Building the graph
 
-There are two main commands required to build and deploy to Goldsky. Depending on the environment you wish to deploy, they will vary based on name.
+There are two main commands required to build and deploy. Depending on the environment you wish to deploy, they will vary based on name.
 
-### Local
+### Local - Goldsky
 
 For a local deployment for testing, you can also make use of grafting. On lines 7 & 8 of the `subgraph.template.yaml` file, you can specify a base image and block number to graft from. It is recommended that you use the most recently deployed testnet base image. You can find this by visit that version and checking the logs on Goldsky. It will be shown as `subgraph_id: <image-id>`. Once these have been set you can run the following.
 
 ```shell
 yarn build
+yarn deploy:local
+```
+
+If you wish to make a local deployment without grafting, you can use the following.
+
+```shell
+yarn build:ci
 yarn deploy:local
 ```
 
@@ -77,20 +85,16 @@ yarn deploy:local:overwrite
 
 Using this will overwrite your development deployment which can be useful when debugging issues as otherwise, you will have to manually remove previous deployments from the Goldsky GUI.
 
-### Goerli
-
-Grafting is automatically disabled for this environment.
+### Goerli - Goldsky
 
 ```shell
-yarn build
+yarn build:ci
 yarn deploy:goerli
 ```
 
-### Mainnet
-
-Grafting is automatically disabled for this environment.
+### Mainnet - Goldsky && TheGraph
 
 ```shell
-yarn build
+yarn build:ci
 yarn deploy:one
 ```
