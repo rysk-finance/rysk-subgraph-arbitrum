@@ -6,6 +6,7 @@ generated
 subgraph.yaml
 config.json
 src/addresses.ts
+temp
 
 # yarn
 yarn-error.log

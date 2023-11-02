@@ -1,14 +1,16 @@
 {
   "name": "rysk-subgraph",
-  "version": "1.3.5",
+  "version": "1.4.0",
   "license": "UNLICENSED",
   "scripts": {
     "prepare": "scripts/generate_addresses.sh && mustache config.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:ci": "scripts/remove_graft.sh",
     "build": "yarn prepare && graph codegen && graph build",
+    "build:ci": "yarn prepare:ci && yarn prepare && graph codegen && graph build && scripts/post_build.sh",
     "deploy:local": "scripts/deploy.sh arbitrum-local",
     "deploy:local:overwrite": "scripts/deploy.sh arbitrum-local --overwrite",
-    "deploy:goerli": "scripts/deploy.sh arbitrum-goerli --remove-graft",
-    "deploy:one": "scripts/deploy.sh arbitrum-one --remove-graft",
+    "deploy:goerli": "scripts/deploy.sh arbitrum-goerli",
+    "deploy:one": "scripts/deploy.sh arbitrum-one",
     "test": "graph test"
   },
   "dependencies": {

@@ -1,30 +1,30 @@
-import { BigInt, Address, BigDecimal } from '@graphprotocol/graph-ts'
+import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
+import { chainlinkAggregator } from '../generated/liquidityPool/chainlinkAggregator'
 import {
   BuybackOption,
   Deposit,
   DepositEpochExecuted,
   InitiateWithdraw,
+  RebalancePortfolioDelta,
   Redeem,
   Withdraw,
+  WithdrawalEpochExecuted,
   WriteOption,
   liquidityPool,
-  WithdrawalEpochExecuted,
-  RebalancePortfolioDelta,
 } from '../generated/liquidityPool/liquidityPool'
-import { chainlinkAggregator } from '../generated/liquidityPool/chainlinkAggregator'
 import {
   BuybackOptionAction,
   // DailyStatSnapshot,
   DepositAction,
   InitiateWithdrawAction,
   LPBalance,
-  RedeemSharesAction,
+  PricePerShare,
   RebalanceDeltaAction,
+  RedeemSharesAction,
   WithdrawAction,
   WriteOptionsAction,
-  PricePerShare,
 } from '../generated/schema'
-import { LIQUIDITY_POOL, CHAINLINK_AGGREGATOR } from './addresses'
+import { CHAINLINK_AGGREGATOR_ARB_USD, CHAINLINK_AGGREGATOR_ETH_USD, LIQUIDITY_POOL } from './addresses'
 import { BIGINT_ZERO } from './constants'
 
 export function handleDeposit(event: Deposit): void {
@@ -149,7 +149,8 @@ export function handleBuybackOption(event: BuybackOption): void {
 
 export function handleWithdrawalEpochExecuted(event: WithdrawalEpochExecuted): void {
   const lpContract = liquidityPool.bind(Address.fromString(LIQUIDITY_POOL))
-  const chainlinkAggregatorContract = chainlinkAggregator.bind(Address.fromString(CHAINLINK_AGGREGATOR))
+  const chainlinkAggregatorContractARB = chainlinkAggregator.bind(Address.fromString(CHAINLINK_AGGREGATOR_ARB_USD))
+  const chainlinkAggregatorContractETH = chainlinkAggregator.bind(Address.fromString(CHAINLINK_AGGREGATOR_ETH_USD))
 
   const timestamp = event.block.timestamp
   // const totalAssets = lpContract.getAssets();
@@ -178,14 +179,22 @@ export function handleWithdrawalEpochExecuted(event: WithdrawalEpochExecuted): v
     .times(BigDecimal.fromString('100'))
   pricePerShare.value = currentPricePerShare
 
-  const ethPrice = chainlinkAggregatorContract.latestAnswer()
+  const arbPrice = chainlinkAggregatorContractARB.try_latestAnswer()
+  
+  if (!arbPrice.reverted) {
+    pricePerShare.arbPrice = arbPrice.value
+  } else {
+    pricePerShare.arbPrice = BigInt.fromI32(0)
+  }
+
+  const ethPrice = chainlinkAggregatorContractETH.latestAnswer()
   pricePerShare.ethPrice = ethPrice
 
   pricePerShare.save()
 }
 
 export function handleRebalancePortfolioDelta(event: RebalancePortfolioDelta): void {
-  const chainlinkAggregatorContract = chainlinkAggregator.bind(Address.fromString(CHAINLINK_AGGREGATOR))
+  const chainlinkAggregatorContract = chainlinkAggregator.bind(Address.fromString(CHAINLINK_AGGREGATOR_ETH_USD))
 
   const id = event.transaction.hash.toHex()
   const timestamp = event.block.timestamp

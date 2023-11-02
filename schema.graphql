@@ -115,6 +115,7 @@ type PricePerShare @entity {
   timestamp: BigInt!
   value: BigInt!
   growthSinceFirstEpoch: BigDecimal!
+  arbPrice: BigInt!
   ethPrice: BigInt!
 }
 
@@ -221,6 +222,29 @@ type ERC20 @entity {
   symbol: String!
   name: String!
   decimals: Int!
+}
+
+type AirdropTransaction @entity {
+  id: ID!
+
+  address: Bytes!
+  decimals: Int!
+  name: String!
+  symbol: String!
+
+  amount: BigInt!
+  arbPrice: BigInt!
+  from: Bytes!
+  to: Bytes!
+}
+
+type AirdropRecipient @entity {
+  id: ID!
+
+  totalTokens: BigInt!
+  totalValue: BigDecimal!
+
+  transactions: [AirdropTransaction!]!
 }
 
 type OToken @entity {
@@ -473,10 +497,7 @@ type RedeemAction @entity {
 
   "the payout goes to"
   receiver: Bytes!
-
 }
-
-
 
 type WhitelistedProduct @entity {
   id: ID!
