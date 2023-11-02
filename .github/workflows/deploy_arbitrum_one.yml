@@ -7,10 +7,13 @@ on:
     paths:
       - 'package.json'
 
+  workflow_dispatch:
+
 jobs:
   Deploy:
     env:
       GOLDSKY_TOKEN: ${{ secrets.GOLDSKY_TOKEN }}
+      THE_GRAPH_TOKEN: ${{ secrets.THE_GRAPH_TOKEN }}
 
       NETWORK: arbitrum-one
 
