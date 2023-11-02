@@ -227,6 +227,7 @@ type ERC20 @entity {
 type AirdropTransaction @entity {
   id: ID!
 
+  timestamp: BigInt!
   address: Bytes!
   decimals: Int!
   name: String!

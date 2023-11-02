@@ -4,7 +4,7 @@ import { Transfer } from '../generated/ARB/ERC20'
 import { chainlinkAggregator } from '../generated/ARB/chainlinkAggregator'
 import { AirdropRecipient, AirdropTransaction } from '../generated/schema'
 import { CHAINLINK_AGGREGATOR_ARB_USD, TREASURY } from './addresses'
-import { BIG_DECIMAL_1e18, BIG_DECIMAL_1e8 } from './constants'
+import { BIGINT_ZERO, BIG_DECIMAL_1e18, BIG_DECIMAL_1e8 } from './constants'
 
 export function handleTransfer(event: Transfer): void {
   const amount = event.params.value
@@ -14,10 +14,10 @@ export function handleTransfer(event: Transfer): void {
 
   // get current ARB price.
   const chainlinkAggregatorContractARB = chainlinkAggregator.bind(Address.fromString(CHAINLINK_AGGREGATOR_ARB_USD))
-  const arbPrice = chainlinkAggregatorContractARB.latestAnswer()
+  const arbPrice = chainlinkAggregatorContractARB.try_latestAnswer()
 
   // Get USD value.
-  const price = arbPrice.toBigDecimal().div(BIG_DECIMAL_1e8)
+  const price = !arbPrice.reverted ? arbPrice.value.toBigDecimal().div(BIG_DECIMAL_1e8) : BIGINT_ZERO.toBigDecimal()
   const value = amount
     .toBigDecimal()
     .div(BIG_DECIMAL_1e18)
@@ -26,14 +26,15 @@ export function handleTransfer(event: Transfer): void {
   if (fromAddress.toHexString() == TREASURY) {
     // Create transaction entity.
     const newTransaction = new AirdropTransaction(transactionHash)
-
+    
+    newTransaction.timestamp = event.block.timestamp
     newTransaction.address = event.address
     newTransaction.decimals = 18
     newTransaction.name = 'Arbitrum'
     newTransaction.symbol = 'ARB'
 
     newTransaction.amount = amount
-    newTransaction.arbPrice = arbPrice
+    newTransaction.arbPrice = !arbPrice.reverted ? arbPrice.value : BIGINT_ZERO
     newTransaction.from = fromAddress
     newTransaction.to = toAddress
 
