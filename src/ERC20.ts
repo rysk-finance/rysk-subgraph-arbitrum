@@ -7,26 +7,27 @@ import { CHAINLINK_AGGREGATOR_ARB_USD, TREASURY } from './addresses'
 import { BIGINT_ZERO, BIG_DECIMAL_1e18, BIG_DECIMAL_1e8 } from './constants'
 
 export function handleTransfer(event: Transfer): void {
-  const amount = event.params.value
   const fromAddress = event.params.from
-  const toAddress = event.params.to
-  const transactionHash = event.transaction.hash.toHex()
-
-  // get current ARB price.
-  const chainlinkAggregatorContractARB = chainlinkAggregator.bind(Address.fromString(CHAINLINK_AGGREGATOR_ARB_USD))
-  const arbPrice = chainlinkAggregatorContractARB.try_latestAnswer()
-
-  // Get USD value.
-  const price = !arbPrice.reverted ? arbPrice.value.toBigDecimal().div(BIG_DECIMAL_1e8) : BIGINT_ZERO.toBigDecimal()
-  const value = amount
-    .toBigDecimal()
-    .div(BIG_DECIMAL_1e18)
-    .times(price)
 
   if (fromAddress.toHexString() == TREASURY) {
+    const amount = event.params.value
+    const toAddress = event.params.to
+    const transactionHash = event.transaction.hash.toHex()
+
+    // get current ARB price.
+    const chainlinkAggregatorContractARB = chainlinkAggregator.bind(Address.fromString(CHAINLINK_AGGREGATOR_ARB_USD))
+    const arbPrice = chainlinkAggregatorContractARB.try_latestAnswer()
+
+    // Get USD value.
+    const price = !arbPrice.reverted ? arbPrice.value.toBigDecimal().div(BIG_DECIMAL_1e8) : BIGINT_ZERO.toBigDecimal()
+    const value = amount
+      .toBigDecimal()
+      .div(BIG_DECIMAL_1e18)
+      .times(price)
+
     // Create transaction entity.
     const newTransaction = new AirdropTransaction(transactionHash)
-    
+
     newTransaction.timestamp = event.block.timestamp
     newTransaction.address = event.address
     newTransaction.decimals = 18
