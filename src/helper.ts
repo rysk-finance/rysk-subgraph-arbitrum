@@ -26,6 +26,7 @@ function updateOptionLongPosition(
   tradeId: string,
   total: BigInt,
   vaultId: string,
+  fees: BigInt,
 ): void {
   let initPositionId = BIGINT_ZERO
 
@@ -40,6 +41,7 @@ function updateOptionLongPosition(
   position.netAmount = isBuy ? position.netAmount.plus(amount) : position.netAmount.minus(amount)
 
   position.realizedPnl = isBuy ? position.realizedPnl.minus(total) : position.realizedPnl.plus(total)
+  position.fees = position.fees.plus(fees)
 
   if (isBuy) {
     position.buyAmount = position.buyAmount.plus(amount)
@@ -67,6 +69,7 @@ export function updateOptionShortPosition(
   tradeId: string,
   total: BigInt,
   vaultId: string,
+  fees: BigInt,
 ): void {
   let initPositionId = BIGINT_ZERO
 
@@ -81,6 +84,7 @@ export function updateOptionShortPosition(
   position.netAmount = isBuy ? position.netAmount.plus(amount) : position.netAmount.minus(amount)
 
   position.realizedPnl = isBuy ? position.realizedPnl.minus(total) : position.realizedPnl.plus(total)
+  position.fees = position.fees.plus(fees)
 
   if (isBuy) {
     position.buyAmount = position.buyAmount.plus(amount)
@@ -115,6 +119,7 @@ export function loadOrCreateLongPosition(user: Address, oToken: string, numId: B
     position.buyAmount = BIGINT_ZERO
     position.sellAmount = BIGINT_ZERO
     position.realizedPnl = BIGINT_ZERO
+    position.fees = BIGINT_ZERO
     position.active = true
 
     position.optionsBoughtTransactions = []
@@ -148,6 +153,7 @@ export function loadOrCreateShortPosition(
     position.buyAmount = BIGINT_ZERO
     position.sellAmount = BIGINT_ZERO
     position.realizedPnl = BIGINT_ZERO
+    position.fees = BIGINT_ZERO
     position.active = true
 
     position.optionsBoughtTransactions = []
@@ -468,8 +474,6 @@ export function addOptionsBoughtAction(event: OptionsBought): void {
 
   optionsBoughtAction.save()
 
-  const total = premium.plus(fee)
-
   // add fees to stats
   updateStats(amount, fee, true)
 
@@ -484,13 +488,13 @@ export function addOptionsBoughtAction(event: OptionsBought): void {
         txLogs[i].topics[2].toHexString().slice(26) == from.toHexString().slice(2)
       ) {
         // if topic is shortOTokenBurned and account owner is tx sender (trader)
-        updateOptionShortPosition(true, buyer, otoken, amount, id, total, vaultId)
+        updateOptionShortPosition(true, buyer, otoken, amount, id, premium, vaultId, fee)
         return
       }
     }
   }
 
-  updateOptionLongPosition(true, buyer, otoken, amount, id, total, vaultId)
+  updateOptionLongPosition(true, buyer, otoken, amount, id, premium, vaultId, fee)
 }
 
 export function addOptionsSoldAction(event: OptionsSold): void {
@@ -504,6 +508,8 @@ export function addOptionsSoldAction(event: OptionsSold): void {
   const seller = event.params.seller
   const otoken = event.params.series.toHex()
   const amount = event.params.optionAmount
+  const premium = event.params.premium
+  const fee = event.params.fee
 
   const id = txHash + '-' + otoken
 
@@ -512,8 +518,8 @@ export function addOptionsSoldAction(event: OptionsSold): void {
   optionsSoldAction.otoken = otoken
   optionsSoldAction.seller = seller
   optionsSoldAction.amount = amount
-  optionsSoldAction.premium = event.params.premium
-  optionsSoldAction.fee = event.params.fee
+  optionsSoldAction.premium = premium
+  optionsSoldAction.fee = fee
   optionsSoldAction.timestamp = event.block.timestamp
   optionsSoldAction.transactionHash = event.transaction.hash.toHex()
 
@@ -527,10 +533,8 @@ export function addOptionsSoldAction(event: OptionsSold): void {
 
   optionsSoldAction.save()
 
-  const total = event.params.premium.minus(event.params.fee)
-
   // add fees to stats
-  updateStats(event.params.optionAmount, event.params.fee, false)
+  updateStats(amount, fee, false)
 
   const vaultId = getVaultIdFromLogs(seller, txLogs)
 
@@ -544,12 +548,12 @@ export function addOptionsSoldAction(event: OptionsSold): void {
       ) {
         // if topic is shortOtokenMinted and account owner is tx sender (trader)
 
-        updateOptionShortPosition(false, seller, otoken, amount, id, total, vaultId)
+        updateOptionShortPosition(false, seller, otoken, amount, id, premium, vaultId, fee)
         return
       }
     }
   }
-  updateOptionLongPosition(false, seller, otoken, amount, id, total, vaultId)
+  updateOptionLongPosition(false, seller, otoken, amount, id, premium, vaultId, fee)
 }
 
 // dashboard functions
