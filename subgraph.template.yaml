@@ -4,8 +4,8 @@ schema:
 features:
   - grafting
 graft:
-  base: QmNMykRLjkQqPi1o7qozoZPsKBLUgxQ7DjygfwH2dn572W
-  block: 51900000
+  base: QmS3br14bkXSCJjZMVY92E2qnmBXj75GdGqM6TqzF9xoQF
+  block: 53433000
 dataSources:
   - kind: ethereum
     name: liquidityPool
@@ -385,27 +385,27 @@ dataSources:
       file: ./src/Oracle.ts
 
   - kind: ethereum
-    name: ARB
+    name: Disperse
     network: {{network}}
     source:
-      abi: ERC20
-      address: "{{ARB}}"
-      startBlock: {{ARB-start-block}}
+      abi: Disperse
+      address: "{{disperse}}"
+      startBlock: {{disperse-start-block}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - ARBTreasuryAirdrop
+        - AirdropRecipient
       abis:
-        - name: ERC20
-          file: ./abis/ERC20.json
+        - name: Disperse
+          file: ./abis/Disperse.json
         - name: chainlinkAggregator
           file: ./abis/AggregatorV3__ABI.json
       eventHandlers:
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-      file: ./src/ERC20.ts
+        - event: TokenDispersed(indexed address,indexed address,indexed address,uint256)
+          handler: handleTokenDisperse
+      file: ./src/disperse.ts
 
 templates:
   - name: OToken

@@ -1,16 +1,17 @@
 import { Address } from '@graphprotocol/graph-ts'
 
-import { Transfer } from '../generated/ARB/ERC20'
-import { chainlinkAggregator } from '../generated/ARB/chainlinkAggregator'
+import { TokenDispersed } from '../generated/Disperse/Disperse'
+import { chainlinkAggregator } from '../generated/Disperse/chainlinkAggregator'
 import { AirdropRecipient, AirdropTransaction } from '../generated/schema'
-import { CHAINLINK_AGGREGATOR_ARB_USD, TREASURY } from './addresses'
+import { ARB_ADDRESS, CHAINLINK_AGGREGATOR_ARB_USD, TREASURY } from './addresses'
 import { BIGINT_ZERO, BIG_DECIMAL_1e18, BIG_DECIMAL_1e8 } from './constants'
 
-export function handleTransfer(event: Transfer): void {
+export function handleTokenDisperse(event: TokenDispersed): void {
   const fromAddress = event.params.from
+  const token = event.params.token
 
-  if (fromAddress.toHexString() == TREASURY) {
-    const amount = event.params.value
+  if (fromAddress.toHexString() == TREASURY && token.toHexString() == ARB_ADDRESS) {
+    const amount = event.params.amount
     const toAddress = event.params.to
     const transactionHash = event.transaction.hash.toHex()
 

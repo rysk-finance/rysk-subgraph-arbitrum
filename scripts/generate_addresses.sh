@@ -30,10 +30,10 @@ config=$(
     --arg address_book_block $ADDRESS_BOOK_BLOCK \
     --arg alpha_porfolio_values_feed $ALPHA_PORTFOLIO_VALUES_FEED \
     --arg alpha_porfolio_values_feed_block $ALPHA_PORTFOLIO_VALUES_FEED_BLOCK \
-    --arg arb $ARB \
-    --arg arb_block $ARB_BLOCK \
     --arg controller $CONTROLLER \
     --arg controller_block $CONTROLLER_BLOCK \
+    --arg disperse $DISPERSE \
+    --arg disperse_block $DISPERSE_BLOCK \
     --arg liquidity_pool $LIQUIDITY_POOL \
     --arg liquidity_pool_block $LIQUIDITY_POOL_BLOCK \
     --arg option_catalogue $OPTION_CATALOGUE \
@@ -56,10 +56,10 @@ config=$(
       "alphaPortfolioValuesFeed-start-block": $alpha_porfolio_values_feed_block|tonumber,
       "addressBook": $address_book,
       "addressBook-start-block": $address_book_block|tonumber,
-      "ARB": $arb,
-      "ARB-start-block": $arb_block|tonumber,
       "controller": $controller,
       "controller-start-block": $controller_block|tonumber,
+      "disperse": $disperse,
+      "disperse-start-block": $disperse_block|tonumber,
       "liquidityPool": $liquidity_pool,
       "liquidityPool-start-block": $liquidity_pool_block|tonumber,
       "optionCatalogue": $option_catalogue,
@@ -98,5 +98,6 @@ echo 'export const TREASURY = "'$(to_lowercase $TREASURY)'"' >> $addresses_file
 
 echo >> $addresses_file
 echo '// Currency addresses.' >> $addresses_file
+echo 'export const ARB_ADDRESS = "'$(to_lowercase $ARB)'"' >> $addresses_file
 echo 'export const USDC_ADDRESS = "'$(to_lowercase $USDC)'"' >> $addresses_file
 echo 'export const WETH_ADDRESS = "'$(to_lowercase $WETH)'"' >> $addresses_file
