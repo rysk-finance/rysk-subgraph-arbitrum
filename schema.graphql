@@ -147,14 +147,14 @@ type Collateral @entity {
 type SABR @entity {
   " Equals to expiry"
   id: ID!
-  callAlpha: Int!,
-  callBeta: Int!,
-  callRho: Int!,
-  callVolvol: Int!,
-  putAlpha: Int!,
-  putBeta: Int!,
-  putRho: Int!,
-  putVolvol: Int!,
+  callAlpha: Int!
+  callBeta: Int!
+  callRho: Int!
+  callVolvol: Int!
+  putAlpha: Int!
+  putBeta: Int!
+  putRho: Int!
+  putVolvol: Int!
   interestRate: BigInt!
 }
 
