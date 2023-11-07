@@ -13,6 +13,7 @@ jobs:
   Deploy:
     env:
       GOLDSKY_TOKEN: ${{ secrets.GOLDSKY_TOKEN }}
+      ORMI_TOKEN: ${{ secrets.ORMI_TOKEN }}
       THE_GRAPH_TOKEN: ${{ secrets.THE_GRAPH_TOKEN }}
 
       NETWORK: arbitrum-goerli
