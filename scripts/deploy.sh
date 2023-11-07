@@ -36,12 +36,12 @@ goldsky \
 echo Deploying to Ormi...
 
 0xgraph \
-  create $deployment_name \
+  create rysk/$deployment_name \
   --node http://api.0xgraph.xyz/deploy/ \
   --access-token $ORMI_TOKEN
 
 0xgraph \
-  deploy $deployment_name \
+  deploy rysk/$deployment_name \
   --version-label $deployment_version \
   --deploy-key $ORMI_TOKEN
 
