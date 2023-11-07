@@ -16,18 +16,36 @@ flags=${@:2}
 
 # Deploy TheGraph only on mainnet.
 if [[ $deployment_name == arbitrum-one ]]; then
+  echo Deploying to TheGraph...
+
   graph \
     deploy rysk-finance/$deployment_name \
     --product hosted-service \
     --deploy-key $THE_GRAPH_TOKEN
 fi
 
+# Deploy Goldsky.
+echo Deploying to Goldsky...
+
 goldsky \
   subgraph deploy $deployment \
   $flags \
   --token $GOLDSKY_TOKEN
 
-if [[ $(printenv CI) == 'true' ]]; then
+# Deploy Ormi.
+echo Deploying to Ormi...
+
+0xgraph \
+  create $deployment_name \
+  --node http://api.0xgraph.xyz/deploy/ \
+  --access-token $ORMI_TOKEN
+
+0xgraph \
+  deploy $deployment_name \
+  --version-label $deployment_version \
+  --deploy-key $ORMI_TOKEN
+
+if [[ $CI == 'true' ]]; then
   exit 0
 fi
 
