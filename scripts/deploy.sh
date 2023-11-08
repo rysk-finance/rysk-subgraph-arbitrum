@@ -37,7 +37,6 @@ echo Deploying to Ormi...
 
 0xgraph \
   create rysk/$deployment_name \
-  --node http://api.0xgraph.xyz/deploy/ \
   --access-token $ORMI_TOKEN
 
 0xgraph \
