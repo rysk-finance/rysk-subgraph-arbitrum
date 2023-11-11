@@ -2,9 +2,17 @@ import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts'
 
 import { OptionsBought, OptionsSold } from '../generated/OptionExchange/OptionExchange'
 import { chainlinkAggregator } from '../generated/OptionExchange/chainlinkAggregator'
-import { Account, LongPosition, OptionsBoughtAction, OptionsSoldAction, ShortPosition, Stat } from '../generated/schema'
+import {
+  Account,
+  AirdropStat,
+  LongPosition,
+  OptionsBoughtAction,
+  OptionsSoldAction,
+  ShortPosition,
+  Stat,
+} from '../generated/schema'
 import { CHAINLINK_AGGREGATOR_ETH_USD, CONTROLLER } from './addresses'
-import { BIGINT_ONE, BIGINT_ZERO, DEFAULT_VAULT_ID, ZERO_ADDRESS } from './constants'
+import { BIGINT_ONE, BIGINT_ZERO, BIG_DECIMAL_ZERO, DEFAULT_VAULT_ID, ZERO_ADDRESS } from './constants'
 
 export const SHORT_OTOKEN_BURNED = '0xdd96b18f26fd9950581b9fd821fa907fc318845fc4d220b825a7b19bfdd174e8'
 export const SHORT_OTOKEN_MINTED = '0x4d7f96086c92b2f9a254ad21548b1c1f2d99502c7949508866349b96bb1a8d8a'
@@ -583,4 +591,18 @@ export function loadOrCreateStats(): Stat {
   }
 
   return stats
+}
+
+export function loadOrCreateAirdropStats(): AirdropStat {
+  const stat = AirdropStat.load('0')
+
+  if (stat) return stat
+
+  const newStat = new AirdropStat('0')
+
+  newStat.totalArb = BIGINT_ZERO
+  newStat.totalRecipients = 0
+  newStat.totalValue = BIG_DECIMAL_ZERO
+
+  return newStat
 }

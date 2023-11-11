@@ -5,6 +5,7 @@ import { chainlinkAggregator } from '../generated/Disperse/chainlinkAggregator'
 import { AirdropRecipient, AirdropTransaction } from '../generated/schema'
 import { ARB_ADDRESS, CHAINLINK_AGGREGATOR_ARB_USD, TREASURY } from './addresses'
 import { BIGINT_ZERO, BIG_DECIMAL_1e18, BIG_DECIMAL_1e8 } from './constants'
+import { loadOrCreateAirdropStats } from './helper'
 
 export function handleTokenDisperse(event: TokenDispersed): void {
   const fromAddress = event.params.from
@@ -25,6 +26,17 @@ export function handleTokenDisperse(event: TokenDispersed): void {
       .toBigDecimal()
       .div(BIG_DECIMAL_1e18)
       .times(price)
+
+    // Get AirdropStats and update total ARB and total value.
+    const airdropStat = loadOrCreateAirdropStats()
+
+    const totalAirdropArb = airdropStat.totalArb
+    const totalAirdropValue = airdropStat.totalValue
+
+    airdropStat.totalArb = totalAirdropArb.plus(amount)
+    airdropStat.totalValue = totalAirdropValue.plus(value)
+
+    airdropStat.save()
 
     // Create transaction entity.
     const newTransaction = new AirdropTransaction(transactionHash)
@@ -69,5 +81,12 @@ export function handleTokenDisperse(event: TokenDispersed): void {
     newUser.transactions = [transactionHash]
 
     newUser.save()
+
+    // Update AirdropStats with new user.
+    const totalAirdropRecipients = airdropStat.totalRecipients
+
+    airdropStat.totalRecipients = totalAirdropRecipients + 1
+
+    airdropStat.save()
   }
 }
