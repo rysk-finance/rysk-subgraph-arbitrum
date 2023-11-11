@@ -11,6 +11,7 @@ fi
 
 deployment_name=$1
 deployment_version=$(cat package.json | jq .version -r)
+ormi_deploment_version=$(echo $deployment_version | tr -d ".")
 deployment=$deployment_name/$deployment_version
 flags=${@:2}
 
@@ -36,11 +37,11 @@ goldsky \
 echo Deploying to Ormi...
 
 0xgraph \
-  create rysk/$deployment_name \
+  create rysk/$deployment_name-$ormi_deploment_version \
   --access-token $ORMI_TOKEN
 
 0xgraph \
-  deploy rysk/$deployment_name \
+  deploy rysk/$deployment_name-$ormi_deploment_version \
   --version-label $deployment_version \
   --deploy-key $ORMI_TOKEN
 
