@@ -1,6 +1,6 @@
 {
   "name": "rysk-subgraph",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "license": "UNLICENSED",
   "scripts": {
     "prepare": "scripts/generate_addresses.sh && mustache config.json subgraph.template.yaml > subgraph.yaml",

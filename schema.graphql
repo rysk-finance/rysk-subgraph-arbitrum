@@ -248,6 +248,14 @@ type AirdropRecipient @entity {
   transactions: [AirdropTransaction!]!
 }
 
+type AirdropStat @entity {
+  id: ID!
+
+  totalArb: BigInt!
+  totalRecipients: Int!
+  totalValue: BigDecimal!
+}
+
 type OToken @entity {
   id: ID!
 
