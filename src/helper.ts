@@ -490,12 +490,11 @@ export function addOptionsBoughtAction(event: OptionsBought): void {
   for (let i = 0; i < txLogs.length; ++i) {
     // if event is to Controller, avoid reading all events
     if (txLogs[i].address.toHexString() == CONTROLLER) {
-      // if topic is ShortOtokenBurned and account owner is tx sender (trader)
+      // if topic is ShortOtokenBurned and account owner is not the options exchange to exclude options exchange trades
       if (
         txLogs[i].topics[0].toHexString() == SHORT_OTOKEN_BURNED &&
         txLogs[i].topics[2].toHexString().slice(26) != OPTION_EXCHANGE
       ) {
-        // if topic is shortOTokenBurned and account owner is tx sender (trader)
         updateOptionShortPosition(true, buyer, otoken, amount, id, premium, vaultId, fee)
         return
       }
@@ -549,13 +548,11 @@ export function addOptionsSoldAction(event: OptionsSold): void {
   for (let i = 0; i < txLogs.length; ++i) {
     // if event is to Controller, avoid reading all events
     if (txLogs[i].address.toHexString() == CONTROLLER) {
-      // if topic is ShortOtokenMinted and account owner is tx sender (trader)
+      // if topic is ShortOtokenMinted and account owner is not the options exchange to exclude options exchange trades
       if (
         txLogs[i].topics[0].toHexString() == SHORT_OTOKEN_MINTED &&
         txLogs[i].topics[2].toHexString().slice(26) != OPTION_EXCHANGE
       ) {
-        // if topic is shortOtokenMinted and account owner is tx sender (trader)
-
         updateOptionShortPosition(false, seller, otoken, amount, id, premium, vaultId, fee)
         return
       }
