@@ -4,8 +4,8 @@ schema:
 features:
   - grafting
 graft:
-  base: QmebMdvGgygn8h3AVwTVi3ksXomspAVh2MQvxAmynwCjKq
-  block: 169239005
+  base: QmQ4C3BsQTdyWKLLFETcXiqF5fQG4ZEr2g63ge2zyqxfk2
+  block: 53433000
 dataSources:
   - kind: ethereum
     name: liquidityPool
