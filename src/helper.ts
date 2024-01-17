@@ -11,7 +11,7 @@ import {
   ShortPosition,
   Stat,
 } from '../generated/schema'
-import { CHAINLINK_AGGREGATOR_ETH_USD, CONTROLLER } from './addresses'
+import { CHAINLINK_AGGREGATOR_ETH_USD, CONTROLLER, OPTION_EXCHANGE } from './addresses'
 import { BIGINT_ONE, BIGINT_ZERO, BIG_DECIMAL_ZERO, DEFAULT_VAULT_ID, ZERO_ADDRESS } from './constants'
 
 export const SHORT_OTOKEN_BURNED = '0xdd96b18f26fd9950581b9fd821fa907fc318845fc4d220b825a7b19bfdd174e8'
@@ -493,7 +493,7 @@ export function addOptionsBoughtAction(event: OptionsBought): void {
       // if topic is ShortOtokenBurned and account owner is tx sender (trader)
       if (
         txLogs[i].topics[0].toHexString() == SHORT_OTOKEN_BURNED &&
-        txLogs[i].topics[2].toHexString().slice(26) == from.toHexString().slice(2)
+        txLogs[i].topics[2].toHexString().slice(26) != OPTION_EXCHANGE
       ) {
         // if topic is shortOTokenBurned and account owner is tx sender (trader)
         updateOptionShortPosition(true, buyer, otoken, amount, id, premium, vaultId, fee)
@@ -552,7 +552,7 @@ export function addOptionsSoldAction(event: OptionsSold): void {
       // if topic is ShortOtokenMinted and account owner is tx sender (trader)
       if (
         txLogs[i].topics[0].toHexString() == SHORT_OTOKEN_MINTED &&
-        txLogs[i].topics[2].toHexString().slice(26) == event.transaction.from.toHexString().slice(2)
+        txLogs[i].topics[2].toHexString().slice(26) != OPTION_EXCHANGE
       ) {
         // if topic is shortOtokenMinted and account owner is tx sender (trader)
 
