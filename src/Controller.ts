@@ -508,7 +508,7 @@ export function handleShortOtokenMinted(event: ShortOtokenMinted): void {
   action.amount = amount
   action.save()
 
-  if (event.transaction.to!.toHex() != OPTION_EXCHANGE) {
+  if (event.params.to.toHex() != OPTION_EXCHANGE) {
     // ignore if not from option exchange as it will not have a position
     return
   }
